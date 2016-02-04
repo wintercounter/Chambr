@@ -1,4 +1,3 @@
-import './Mixins.es6'
 import BASKET from './BASKET.es6'
 
 new class Client {

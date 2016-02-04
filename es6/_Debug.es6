@@ -2,7 +2,7 @@ import * as ENV from './Defaults/System.es6'
 
 try {
     self.window = self.window || {}
-    self.document = self.document || {documentElement: {style: {}}, location: {}}
+    self.document = self.document || {documentElement: {style: {}}, location: {}, createElement: function(){return {}}}
 } catch(e){}
 
 let IS_WORKER = self.document && self.document.querySelector ? '' : ' W'
