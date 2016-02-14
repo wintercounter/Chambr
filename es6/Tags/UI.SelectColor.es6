@@ -12,7 +12,7 @@ riot.tag('select-color', `
     <span each="{ color in Colors }" if="{ color === parent.opts.selected || parent.isOpen}" class="{ color }" onclick="{ click }"></span>
 `, function(){
     this.Colors = Colors
-    this.isOpen = 0
+    this.isOpen = false
 
     this.click = () => {
         this.isOpen = !this.isOpen

@@ -1,7 +1,7 @@
-import riot from 'riot'
+import riot from '../Riot.es6'
 
-riot.tag('app', 'Torma: <yield></yield>', function(){
-    this.on(riot.EV.MOUNT, function(){
+riot.tag('app', '<yield></yield>', function(){
+    this.on('mount', function(){
         ci('Main App mount OK.')
     })
 })
