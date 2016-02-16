@@ -8,7 +8,7 @@ class Notes extends Abstract {
     cache;
 
     get db(){
-        this._db = this._db || new DB({
+        this._db = this._db || new DB(this, {
             name: 'notes',
             sync: true,
             watch: false
@@ -26,21 +26,42 @@ class Notes extends Abstract {
             this.data = this.cache.rows
         }
         catch(err){
-            ce(err)
             return this.reject(err.message)
         }
-
-        return this.resolve('done')
+        return this.resolve('done', true)
     }
 
     async add(title){
         try {
-            let date = new Date().getTime()
-            let res = await this.db.remote.put({
+            let date = parseInt(new Date().getTime() / 1000, 10)
+            await this.db.remote.put({
                 _id: `doc-${date}`,
-                title: title
+                title: title,
+                added: date
             })
             return this.resolve('added')
+        }
+        catch(err){
+            return this.reject(err.message)
+        }
+    }
+
+    async delete(id){
+        try {
+            await this.db.local.get(id).then(doc => this.db.remote.remove(doc))
+            return this.resolve('deleted')
+        }
+        catch(err){
+            return this.reject(err.message)
+        }
+    }
+
+    async setColor(id, color){
+        try {
+            let doc = await this.db.local.get(id)
+            doc.color = color
+            await this.db.remote.put(doc)
+            return this.resolve('done')
         }
         catch(err){
             return this.reject(err.message)

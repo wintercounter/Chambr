@@ -10,11 +10,12 @@ const Colors = [
 
 riot.tag('select-color', `
     <span each="{ color in Colors }" if="{ color === parent.opts.selected || parent.isOpen}" class="{ color }" onclick="{ click }"></span>
-`, function(){
+`, async function(){
     this.Colors = Colors
     this.isOpen = false
 
-    this.click = () => {
+    this.click = ev => {
+        this.isOpen && this.parent.setColor(this.root.dataset.id, ev.target.className)
         this.isOpen = !this.isOpen
         this.update()
     }

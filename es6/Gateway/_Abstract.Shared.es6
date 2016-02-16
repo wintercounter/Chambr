@@ -17,18 +17,14 @@ export default class Abstract {
     }
 
     parse(input){
-        let parsed = input.split(C.EVENT_DELIMITER)
-        let last = parsed[parsed.length - 1]
-        let virtual = last.split('::::')[1]
-        let state = virtual || last.split('::')[1] || false
+        let segments = input.split(C.EVENT_DELIMITER)
+        let last = segments[segments.length - 1]
+        let silent = !last.split('::::')[1]
+        let state = last.split('::::')[1] || last.split('::')[1] || false
 
-        state && (parsed[parsed.length - 1] = last.split('::')[0])
+        state && (segments[segments.length - 1] = last.split('::')[0])
 
-        return {
-            segments: parsed,
-            state: state,
-            silent: !!virtual
-        }
+        return {segments, state, silent}
     }
 
     build(...arg){

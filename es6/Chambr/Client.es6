@@ -1,5 +1,11 @@
 import { BASKET } from './BASKET.es6'
+import Interface from './Interface.es6'
 import riot from '../Riot.es6'
+
+const DATA_STATES = [
+    'done',
+    'change'
+]
 
 new class Client {
     data;
@@ -15,7 +21,8 @@ new class Client {
                 ev = ev || {}
                 let parsed = self.GW.parse(ev.name)
                 parsed.state && BS.trigger('state', parsed)
-                if (parsed.state === 'done' && ev.data) {
+                console.warn(BASKET, data.name, parsed, ev)
+                if (DATA_STATES.indexOf(parsed.state)+1 && typeof ev.data === 'object') {
                     for (let k in BS) {
                         if (BS.hasOwnProperty(k)) delete BS[k]
                     }
@@ -30,8 +37,6 @@ new class Client {
     }
 
     applyAPI(){
-        if (this._hasProto) return
-        this._hasProto = true
         let d = this.data.data || {}
         this.data.api.forEach((method) => {
             Object.defineProperty(d, method, {
@@ -40,6 +45,12 @@ new class Client {
                 writable: false,
                 value: this.__METHOD(this.data.name, method)
             })
+        })
+        Object.defineProperty(d, 'scope', {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: undefined
         })
         riot.observable(d)
         return d
@@ -54,17 +65,15 @@ new class Client {
             if (typeof ag1[0] === 'object' && ag1[0].mixin) {
                 let scope = BASKET[name].scope = ag1[0]
                 ag1 = [].slice.call(ag1, 1)
+                scope && scope.trigger(`state::${method}`)
             }
 
             return new Promise(function(resolve){
                 // TODO once!!!!
-                self.GW.sub(`$->${name}->${method}::done`, function(){
-                    let ag2 = arguments
+                self.GW.sub(`$->${name}->${method}::done`, function(v){
                     let scope = BASKET[name].scope
-                    resolve(that, ag2)
-                    setTimeout(function(){
-                        scope && scope.update()
-                    })
+                    resolve(v)
+                    scope && setTimeout(scope.update)
                 })
                 self.GW.pub(`$->${name}->${method}`, {
                     argList: ag1

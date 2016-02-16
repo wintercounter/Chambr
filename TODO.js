@@ -9,4 +9,5 @@ Tests
  http://swagger.io/
  Change path to names in imports
  Get api from worker
+ Implement filter, count, etc functions in chambr
 */

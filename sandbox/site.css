@@ -29,6 +29,14 @@ a {
     margin: 0 0 3rem;
 }
 
+notes input {
+    margin: 0 auto 3rem;
+    padding: 1rem;
+    display: block;
+    width: 100%;
+    max-width: 25rem;
+}
+
 .note {
     background: white;
     box-shadow: 0 0.25rem 0.5rem -0.125rem rgba(0, 0, 0, 0.3), 0 0.575rem 0 -0.25rem #f2f2f2, 0 0.9rem 0.5rem -0.4rem rgba(0, 0, 0, 0.3), 0 1.12rem 0 -0.5rem #e6e6e6, 0 0.5rem 2rem 0 rgba(0, 0, 0, 0.15);
@@ -56,10 +64,7 @@ a {
     text-decoration: underline;
 }
 .note header {
-    border-bottom: 0.25rem solid #D9453F;
-    padding-bottom: 1rem;
     position: relative;
-    min-height: 2.25rem;
     -moz-transition-property: border-color;
     -o-transition-property: border-color;
     -webkit-transition-property: border-color;
@@ -116,14 +121,13 @@ a {
     line-height: 1rem;
     position: absolute;
     top: 0;
-    right: 0;
+    right: 2rem;
     text-align: right;
     height: 1rem;
 }
 .note .close {
     color: #ccc;
     cursor: pointer;
-    display: none;
     font-size: 1.5rem;
     font-weight: bold;
     line-height: 1rem;

@@ -1,0 +1,2 @@
+net stop "Apache CouchDB01d14eb716d2a3e0"
+net start "Apache CouchDB01d14eb716d2a3e0"

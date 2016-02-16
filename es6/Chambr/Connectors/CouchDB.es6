@@ -1,5 +1,4 @@
 import PDB from 'pouchdb'
-import Observable from 'riot-observable'
 import { DB as C } from '../_Constants.Shared.es6'
 
 export default class {
@@ -9,8 +8,10 @@ export default class {
     config;
     sync;
     changes;
+    host;
 
-    constructor(config = {}){
+    constructor(host, config = {}){
+        this.host = host
         this.config = Object.assign(DEFAULTS, config)
         this.validateConfig()
         this.connect()
@@ -20,7 +21,6 @@ export default class {
         if (this.config.local) {
             this.local = new PDB(this.getUrl(), this.config)
         }
-
         if (this.config.remote) {
             this.remote = new PDB(this.getUrl(true), this.config)
         }
@@ -69,10 +69,8 @@ export default class {
             live: true,
             retry: true
         })
-        .on(C.CHANGE, function (info) {
-            // handle change
-            //ce(arguments)
-        })
+        // Some change happened in the database
+        .on(C.CHANGE, info => this.host.state('change', true))
         .on(C.PAUSED, function () {
             // replication paused (e.g. user went offline)
             //ce(arguments)
@@ -83,7 +81,7 @@ export default class {
         })
         .on(C.DENIED, function (info) {
             // a document failed to replicate, e.g. due to permissions
-            //ce(arguments)
+            ce(arguments)
         })
         .on(C.COMPLETE, function (info) {
             // handle complete
@@ -91,7 +89,10 @@ export default class {
         })
         .on(C.ERROR, function (err) {
             // handle error
-            //ce(arguments)
+            console.log('errored', arguments)
+        })
+        .on('abort', function(){
+            console.log('aborted')
         }))
     }
 
