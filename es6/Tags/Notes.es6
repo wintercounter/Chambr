@@ -34,6 +34,7 @@ async function context(){
         ev.target.value = ''
         v && $.Notes.add(v)
     }
+
     this.delete = ev => $.Notes.delete(ev.target.dataset.id)
     this.setColor = (id, v) => $.Notes.setColor(id, v)
 

@@ -21,7 +21,7 @@ new class Client {
                 ev = ev || {}
                 let parsed = self.GW.parse(ev.name)
                 parsed.state && BS.trigger('state', parsed)
-                console.warn(BASKET, data.name, parsed, ev)
+                //console.warn(BASKET, data.name, parsed, ev)
                 if (DATA_STATES.indexOf(parsed.state)+1 && typeof ev.data === 'object') {
                     for (let k in BS) {
                         if (BS.hasOwnProperty(k)) delete BS[k]
