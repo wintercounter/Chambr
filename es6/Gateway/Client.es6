@@ -15,7 +15,7 @@ export default new class Client extends Abstract {
     constructor(){
         super()
         ci('Gateway Client started.')
-        this.start('/Chambr/dist/worker.js')
+        this.start('./dist/worker.js')
     }
 
     start(worker){

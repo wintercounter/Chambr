@@ -1,3 +1,4 @@
+/*
 import { RIOT_MIXIN as AM_MIXIN } from '../Chambr/_Constants.Shared.es6'
 
 export var Impl = {
@@ -18,3 +19,4 @@ export var Custom = {
     AutoUpdate: true,
     AutoMixins: [AM_MIXIN]
 }
+*/

@@ -4,12 +4,12 @@ const BASKET = {}
 
 export default class Abstract {
 
-    set data(o){
-        this._data = o
+    set modelData(o){
+        this._modelData = o
     }
 
-    get data(){
-        return this._data || {}
+    get modelData(){
+        return this._modelData || {}
     }
 
     constructor(){
@@ -22,8 +22,8 @@ export default class Abstract {
 
     resolve(name = false, silent = false, data = undefined){
         return new Promise(resolve => {
-            resolve(data === undefined ? this.data : data)
-            name && this.state(name, silent, this.data)
+            resolve(data === undefined ? this.modelData : data)
+            name && this.state(name, silent, this.modelData)
         })
     }
 
@@ -39,7 +39,7 @@ export default class Abstract {
         name = silent ? `::${name}` : name
         if (!data && this.load) {
             await this.load()
-            data = this.data
+            data = this.modelData
         }
         self.GW.pub(`$->${this._name}::${name}`, data)
     }

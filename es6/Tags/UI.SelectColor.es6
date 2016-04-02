@@ -15,7 +15,7 @@ riot.tag('select-color', `
     this.isOpen = false
 
     this.click = ev => {
-        this.isOpen && this.parent.setColor(this.root.dataset.id, ev.target.className)
+        this.isOpen && this.parent.setColor(this.opts.doc, ev.target.className)
         this.isOpen = !this.isOpen
         this.update()
     }

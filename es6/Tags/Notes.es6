@@ -5,11 +5,11 @@ new class Notes extends Abstract {
 
     get template(){ return `
 <input onblur="{ blur }" placeholder="Add new">
-<article class="note" each="{ name, v in $.Notes }" no-reorder>
+<article class="note" each="{ name, v in $.Notes }">
     <header>
-        <select-color selected="{ v.doc.color || 'red' }" data-id="{ v.id }"></select-color>
+        <select-color selected="{ v.doc.color || 'red' }" doc="{ v.id }"></select-color>
         <span class="date">{ moment.unix(v.doc.added).format("HH:mm MM/DD") }</span>
-        <span class="close" onclick="{ delete }" data-id="{ v.id }">&times;</span>
+        <span class="close" onclick="{ delete }">&times;</span>
     </header>
 
     <div class="content">
@@ -24,22 +24,31 @@ new class Notes extends Abstract {
     }
 }
 
-async function context(){
-    await $.Notes.load(this)
+function context() {
+
+    this.$.Notes.load().then(() => {
+        this.update()
+    })
+
+    this.$.Notes.on('updated', () => {
+        console.log('yah', this.$.Notes)
+        this.update()
+    })
+
     this.isLoading = false
     this.moment = moment
 
     this.blur = ev => {
         let v = ev.target.value.trim()
         ev.target.value = ''
-        v && $.Notes.add(v)
+        v && this.$.Notes.add(v)
     }
 
-    this.delete = ev => $.Notes.delete(ev.target.dataset.id)
-    this.setColor = (id, v) => $.Notes.setColor(id, v)
+    this.delete = ev => this.$.Notes.delete(ev.item.v.id)
+    this.setColor = (id, v) => this.$.Notes.setColor(id, v)
 
-    $.Notes.on('state::add state::delete', () => this.isLoading = true)
-    $.Notes.on('state::change', () => this.isLoading = false)
+    this.$.Notes.on('state::add state::delete', () => this.isLoading = true)
+    this.$.Notes.on('state::change', () => this.isLoading = false)
 
-    return new Promise(resolve => resolve())
+    //return Promise.resolve()
 }

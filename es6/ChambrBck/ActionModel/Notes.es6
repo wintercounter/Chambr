@@ -1,9 +1,9 @@
-import Abstract from '../ModelAbstract.es6'
-import Chambr from '../Worker.es6'
-import DB from '../Adapters/CouchDB.es6'
-//import { ExposeAPI } from '../Decorators.es6'
+import Abstract from '../_Abstract.es6'
+import DB from '../Connectors/CouchDB.es6'
+import { ExposeAPI } from '../_Decorators.Shared.es6'
 
-export default class Notes extends Abstract {
+export default new @ExposeAPI
+class Notes extends Abstract {
 
     cache;
 
@@ -23,24 +23,23 @@ export default class Notes extends Abstract {
                 limit: 100,
                 descending: true
             })
-            this.modelData = this.cache.rows
+            this.data = this.cache.rows
         }
         catch(err){
             return this.reject(err.message)
         }
-        return this.resolve()
+        return this.resolve('done', true)
     }
 
     async add(title){
         try {
             let date = parseInt(new Date().getTime() / 1000, 10)
-            await this.db.local.put({
+            await this.db.remote.put({
                 _id: `doc-${date}`,
                 title: title,
                 added: date
             })
-            await this.load()
-            return this.resolve()
+            return this.resolve('added')
         }
         catch(err){
             return this.reject(err.message)
@@ -49,10 +48,8 @@ export default class Notes extends Abstract {
 
     async delete(id){
         try {
-            let doc = await this.db.local.get(id)
-            await this.db.local.remove(doc)
-            await this.load()
-            return this.resolve()
+            await this.db.local.get(id).then(doc => this.db.remote.remove(doc))
+            return this.resolve('deleted')
         }
         catch(err){
             return this.reject(err.message)
@@ -63,14 +60,12 @@ export default class Notes extends Abstract {
         try {
             let doc = await this.db.local.get(id)
             doc.color = color
-            await this.db.local.put(doc)
-            await this.load()
-            return this.resolve()
+            await this.db.remote.put(doc)
+            return this.resolve('done')
         }
         catch(err){
             return this.reject(err.message)
         }
     }
-}
 
-Chambr.Model = Notes
+}
