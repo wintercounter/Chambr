@@ -1,7 +1,7 @@
 import Abstract from '../ModelAbstract.es6'
 import Chambr from '../Worker.es6'
 import DB from '../Adapters/CouchDB.es6'
-//import { ExposeAPI } from '../Decorators.es6'
+import { On } from '../Decorators.es6'
 
 export default class Notes extends Abstract {
 
@@ -31,6 +31,7 @@ export default class Notes extends Abstract {
         return this.resolve()
     }
 
+    @On('sanyi')
     async add(title){
         try {
             let date = parseInt(new Date().getTime() / 1000, 10)

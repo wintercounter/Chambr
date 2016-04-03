@@ -28,6 +28,7 @@ let instance = new class Chambr {
                 let responseData  = d.responseData
                 let responseSoft  = d.responseSoft
                 let modelData     = d.modelData
+                let modelExport   = d.modelExport
 
                 if (typeof modelData === 'object') {
                     for (let k in model)
@@ -39,47 +40,73 @@ let instance = new class Chambr {
 
                 if (responseState && responseId) {
                     let methods = this._promises[responseId]
-                    methods && methods[responseState].call(null,
+                    methods && methods[modelEvent.state].call(null,
                         responseData !== undefined
                             ? responseData
                             : modelData
                     )
+                    delete this._promises[responseId]
+                }
+
+                for (let name in modelExport){
+                    // No has own prop needed!
+                    model[name] = modelExport[name]
                 }
 
                 model.trigger(modelEvent.name, modelEvent.data)
                 model.trigger(modelEvent.state, modelEvent.data)
                 model.trigger(responseSoft ? 'soft' : 'hard', d)
                 !responseSoft && model.trigger('updated', d)
-                model.trigger(responseState, d)
+                responseState && model.trigger(responseState, d)
                 modelEvent.data.responseState && model.trigger(modelEvent.data.responseState, modelEvent.data)
             })
         })
     }
 
     applyApi(exposeData){
-        let d = exposeData.modelData || function(...argList){
-            // TODO: Initialize with args
-        }
-        exposeData.modelApi.forEach(method => Object.defineProperty(d, method, {
+        let d = this.applyApiValue(exposeData.modelName, {
+            name: 'constructor',
+            type: 'fn'
+        })
+        Object.assign(d, exposeData.modelData)
+        exposeData.modelApi.forEach(apiData => Object.defineProperty(d, apiData.name, {
             enumerable: false,
-            configurable: false,
-            writable: false,
-            value: this.applyApiMethod(exposeData.modelName, method)
+            configurable: true,
+            writable: true,
+            value: this.applyApiValue(exposeData.modelName, apiData)
         }))
         return Observable(d)
     }
 
-    applyApiMethod(name, method){
+    applyApiValue(name, apiData){
         let that = this
-        return function(...argList){
-            this.trigger(method)
-            return new Promise((resolve, reject) => {
-                that._promises[++that._requestId] = { resolve, reject }
-                HW.pub(`Chambr->${name}->${method}`, {
-                    argList: [].slice.call(argList, 0),
-                    requestId: that._requestId
+        let method = apiData.name
+        let value = undefined
+
+        for (let decorator in apiData.decorators) {
+            if (!apiData.decorators.hasOwnProperty(decorator)) continue;
+            switch(decorator){
+                case 'default':
+                    value = apiData.decorators[decorator]
+                    break;
+                default: break;
+            }
+        }
+
+        if (apiData.type === 'fn') {
+            return function(...argList){
+                this.trigger && this.trigger(method)
+                return new Promise((resolve, reject) => {
+                    that._promises[++that._requestId] = { resolve, reject }
+                    HW.pub(`Chambr->${name}->${method}`, {
+                        argList: [].slice.call(argList, 0),
+                        requestId: that._requestId
+                    })
                 })
-            })
+            }
+        }
+        else if (apiData.type === 'var') {
+            return value
         }
     }
 }

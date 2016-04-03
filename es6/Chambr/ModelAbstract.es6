@@ -1,3 +1,4 @@
+import Chambr from './Worker.es6'
 import Observable from 'riot-observable'
 
 const BASKET = {}
@@ -15,9 +16,26 @@ export default class Abstract {
     constructor(){
         Observable(this)
         this.on('*', (name, data) => {
-            name = name.toLowerCase().charAt(0).toUpperCase() + name.slice(1)
-            this[`_on${name}`] && this[`_on${name}`].call(this, name, data)
+            let onTriggers = this._onTriggerEventHandlers[name]
+            let promises = []
+            onTriggers && onTriggers.forEach(method => {
+                let p = this[method].call(this, name, data)
+                p.then && promises.push(p)
+            })
+
+            if (promises.length) {
+                Promise.all(promises).then(() => {
+                    this.broadcast(name, data, false)
+                })
+            }
+            else {
+                this.broadcast(name, data)
+            }
         })
+    }
+
+    broadcast(name, data = undefined, soft = true){
+        Chambr.Resolve(`Chambr->${this.constructor.name}->Event`, -1, this.modelData, Chambr.Export(this), data, soft, name)
     }
 
     resolve(data = undefined, soft = false, state = 'resolve'){

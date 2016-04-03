@@ -1,45 +1,64 @@
-import Abstract from './_Abstract.es6'
-import DB from '../Connectors/CouchDB.es6'
-import { ExposeAPI } from '../_Decorators.Shared.es6'
+import Abstract from '../ModelAbstract.es6'
+import Chambr from '../Worker.es6'
+import DB from '../Adapters/CouchDB.es6'
+import { Default, On } from '../Decorators.es6'
 
-export default new @ExposeAPI
-class Todo extends Abstract {
+export default class Todo extends Abstract {
 
 	cache;
 
-	get db(){
-		this._db = this._db || new DB(this, {
-				name: 'todo',
-				sync: true,
-				watch: false
-			})
-		return this._db
+	@Default(0)
+	get total(){
+		return Object.keys(this.modelData).length
 	}
 
+	@Default(0)
+	get uncompleted(){
+		let c = 0
+		for (let i in this.modelData) {
+			this.modelData[i].doc.status === 'uncompleted' && c++
+		}
+		return c
+	}
+
+	get _db(){
+		this._dbInstance = this._dbInstance || new DB(this, {
+			name: 'todo',
+			sync: true,
+			watch: false
+		})
+		return this._dbInstance
+	}
+
+	constructor(){super()
+		this.load()
+	}
+
+	@On(DB.EVENT.CHANGE)
 	async load(){
 		try {
-			this.cache = await this.db.local.allDocs({
+			this.cache = await this._db.local.allDocs({
 				include_docs: true,
 				limit: 100,
 				descending: true
 			})
-			this.data = this.cache.rows
+			this.modelData = this.cache.rows
 		}
 		catch(err){
 			return this.reject(err.message)
 		}
-		return this.resolve('done', true)
+		return this.resolve()
 	}
 
 	async add(text){
 		try {
 			let date = parseInt(new Date().getTime() / 1000, 10)
-			await this.db.remote.put({
+			await this._db.local.put({
 				_id: `doc-${date}`,
 				text,
 				status: 'uncompleted'
 			})
-			return this.resolve('added')
+			return this.resolve()
 		}
 		catch(err){
 			return this.reject(err.message)
@@ -48,8 +67,9 @@ class Todo extends Abstract {
 
 	async delete(id){
 		try {
-			await this.db.local.get(id).then(doc => this.db.remote.remove(doc))
-			return this.resolve('deleted')
+			let doc = await this._db.local.get(id)
+			await this._db.local.remove(doc)
+			return this.resolve()
 		}
 		catch(err){
 			return this.reject(err.message)
@@ -58,10 +78,10 @@ class Todo extends Abstract {
 
 	async set(id, key, value){
 		try {
-			let doc = await this.db.local.get(id)
+			let doc = await this._db.local.get(id)
 			doc[key] = value
-			await this.db.remote.put(doc)
-			return this.resolve('done')
+			await this._db.local.put(doc)
+			return this.resolve()
 		}
 		catch(err){
 			return this.reject(err.message)
@@ -69,28 +89,17 @@ class Todo extends Abstract {
 	}
 
 	clear(){
-		for (let i in this.data) {
-			let d = this.data[i]
+		for (let i in this.modelData) {
+			let d = this.modelData[i]
 			d.doc.status === 'completed' && this.delete(d.id)
 		}
 	}
 
 	all(status){
-		for (let i in this.data) {
-			this.set(this.data[i].id, 'status', status)
+		for (let i in this.modelData) {
+			this.set(this.modelData[i].id, 'status', status)
 		}
 	}
-
-	total(){
-		return Object.keys(this.data).length
-	}
-
-	countUncompleted(id, color){
-		let c = 0
-		for (let i in this.data) {
-			this.data[i].doc.status === 'uncompleted' && c++
-		}
-		return c
-	}
-
 }
+
+Chambr.Model = Todo

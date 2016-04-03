@@ -12,7 +12,19 @@ const C = {
     PAUSED: 'paused'
 }
 
-export default class {
+const C_PREFIXED = {
+    CHANGE:   'couchdb-change',
+    COMPLETE: 'couchdb-complete',
+    ERROR:    'couchdb-error',
+    NOW:      'couchdb-now',
+
+    // Only at replication and sync
+    DENIED: 'couchdb-denied',
+    ACTIVE: 'couchdb-active',
+    PAUSED: 'couchdb-paused'
+}
+
+export default class DB {
 
     remote;
     local;
@@ -20,6 +32,10 @@ export default class {
     sync;
     changes;
     host;
+
+    static get EVENT(){
+        return C_PREFIXED
+    }
 
     constructor(host, config = {}){
         this.host = host
@@ -81,7 +97,9 @@ export default class {
             retry: true
         })
         // Some change happened in the database
-        .on(C.CHANGE, info => this.host.trigger('change')))
+        .on(C.CHANGE, info => {
+            this.host.trigger(DB.EVENT.CHANGE)
+        }))
 
         /*.on(C.PAUSED, function () {
             // replication paused (e.g. user went offline)

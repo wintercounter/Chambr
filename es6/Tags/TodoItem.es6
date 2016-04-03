@@ -23,6 +23,7 @@ function context(){
 
 	this.dblclick = ev => {
 		this.editing = true
+		this.root.classList.add('editing')
 		this.update()
 		this.input && this.input.focus()
 	}
@@ -37,7 +38,7 @@ function context(){
 				ev.target.value = this.opts.text
 			}
 			this.editing = false
-			this.update()
+			this.root.classList.remove('editing')
 		}
 	}
 
@@ -58,10 +59,10 @@ function context(){
 	this.change = ev => {
 		let t = ev.target
 		let c = t.checked
-		$.Todo.set(this.opts.id, 'status', c ? 'completed' : 'uncompleted')
+		this.$.Todo.set(this.opts.id, 'status', c ? 'completed' : 'uncompleted')
 	}
 
-	this.edit = text => $.Todo.set(this.opts.id, 'text', text)
-	this.delete = ev => $.Todo.delete(this.opts.id)
+	this.edit = text => this.$.Todo.set(this.opts.id, 'text', text)
+	this.delete = ev => this.$.Todo.delete(this.opts.id)
 }
 

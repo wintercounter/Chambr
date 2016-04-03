@@ -10,63 +10,87 @@ export default class Chambr {
     static set Model(model) {
         MODEL_LIBRARY[model.name] = model
 
-        let API = []
+        let api = []
         Object.getOwnPropertyNames(model.prototype)
-            .forEach((prop) =>
-                prop !== 'constructor'
-                && prop.charAt(0) !== '_'
-                && API.push(prop) && console.warn(prop, typeof model.prototype[prop], Object.getOwnPropertyDescriptor(model.prototype, prop))
-            )
+            .forEach((prop) => {
+                if (prop !== 'constructor' && prop.charAt(0) !== '_'){
+                    let descriptor = Object.getOwnPropertyDescriptor(model.prototype, prop)
+
+                    api.push({
+                        name: prop,
+                        type: descriptor.get ? 'var' : 'fn',
+                        decorators: descriptor.get ? descriptor.get.decorators : descriptor.value.decorators
+                    })
+                }
+            })
+
+        model.prototype._exposedApi = api
 
         HW.pub('Chambr->Expose', {
             modelName: model.name,
-            modelApi: API
+            modelApi: api
         })
     }
 
-    static getModel(modelName){
+    static getModel(modelName, argList = []){
         let model = MODEL_INSTANCES[modelName]
         if (!model) {
-            model = MODEL_INSTANCES[modelName] = new MODEL_LIBRARY[modelName]()
+            model = MODEL_INSTANCES[modelName] = new MODEL_LIBRARY[modelName](...argList)
         }
         return model
     }
 
-    static Resolve(eventName, responseId, modelData, responseData, responseSoft, responseState){
+    static Resolve(eventName, responseId, modelData, modelExport, responseData, responseSoft, responseState = 'resolve'){
         HW.pub(eventName, {
             responseId,
             responseData,
             responseSoft,
             responseState,
-            modelData
+            modelData,
+            modelExport
         }, 'resolve')
     }
 
-    static Reject(eventName, responseId, modelData, responseData, responseSoft, responseState) {
+    static Reject(eventName, responseId, modelData, modelExport, responseData, responseSoft, responseState = 'reject') {
         HW.pub(eventName, {
             responseId,
             responseData,
             responseSoft,
             responseState,
-            modelData
+            modelData,
+            modelExport
         }, 'reject')
+    }
+
+    static Export(model){
+        let results = {}
+        model._exposedApi.forEach(apiData => {
+            apiData.type === 'var' && (results[apiData.name] = model[apiData.name])
+        })
+        return results
     }
 }
 
 HW.sub('Chambr', function(ChambrEvent){
-    console.log(ChambrEvent)
-    let ev     = ChambrEvent.data
-    let route  = ChambrEvent.name.split('->')
-    let model  = Chambr.getModel(route[1])
-    let method = model ? model[route[2]] : false
+    let ev      = ChambrEvent.data
+    let route   = ChambrEvent.name.split('->')
+    let argList = Object.values(ev.argList)
+    let isConstructor = route[2] === 'constructor'
+    let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
+    let method  = model ? model[route[2]] : false
     if (method) {
-        var r = method.apply(model, Object.values(ev.argList))
+        let r = isConstructor
+            ? Promise.resolve({
+                soft: false,
+                state: 'constructed'
+            })
+            : method.apply(model, argList)
         try {
-            r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, o.data, o.soft, o.state))
-            .catch(o => Chambr.Reject (ChambrEvent.name, ev.requestId, model.modelData, o.data, o.soft, o.state))
+            r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+            .catch(o => Chambr.Reject (ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
         }
         catch(e){
-            Chambr.Resolve(ChambrEvent.name, ev.requestId, model, r, true)
+            Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), r, true)
         }
     }
 })
