@@ -9,6 +9,15 @@ export function Default(v){
     }
 }
 
+export function Trigger(){
+    return function(target, name, descriptor){
+        var old = descriptor.value
+        descriptor.value = function(...args){
+            return old.call(this, ...args)
+        }
+    }
+}
+
 export function On(event){
     return function(target, name, descriptor){
         let c = target._onTriggerEventHandlers = target._onTriggerEventHandlers || {}

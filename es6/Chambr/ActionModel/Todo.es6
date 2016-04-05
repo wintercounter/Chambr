@@ -1,7 +1,7 @@
 import Abstract from '../ModelAbstract.es6'
 import Chambr from '../Worker.es6'
 import DB from '../Adapters/CouchDB.es6'
-import { Default, On } from '../Decorators.es6'
+import { Default, On, Trigger } from '../Decorators.es6'
 
 export default class Todo extends Abstract {
 
@@ -9,16 +9,12 @@ export default class Todo extends Abstract {
 
 	@Default(0)
 	get total(){
-		return Object.keys(this.modelData).length
+		return this.modelData.length
 	}
 
 	@Default(0)
 	get uncompleted(){
-		let c = 0
-		for (let i in this.modelData) {
-			this.modelData[i].doc.status === 'uncompleted' && c++
-		}
-		return c
+		return this.modelData.filter(item => item.doc.status === 'uncompleted').length
 	}
 
 	get _db(){
@@ -30,11 +26,13 @@ export default class Todo extends Abstract {
 		return this._dbInstance
 	}
 
-	constructor(){super()
+	constructor(){
+		super()
 		this.load()
 	}
 
 	@On(DB.EVENT.CHANGE)
+	@Trigger()
 	async load(){
 		try {
 			this.cache = await this._db.local.allDocs({
@@ -89,10 +87,9 @@ export default class Todo extends Abstract {
 	}
 
 	clear(){
-		for (let i in this.modelData) {
-			let d = this.modelData[i]
-			d.doc.status === 'completed' && this.delete(d.id)
-		}
+		this.modelData
+			.filter(item => d.doc.status === 'completed')
+			.forEach(item => this.delete(item.id))
 	}
 
 	all(status){
