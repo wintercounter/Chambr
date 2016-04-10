@@ -26,6 +26,39 @@ export function On(event){
     }
 }
 
+export function Peel(...peelList){
+    return function(target, name, descriptor){
+        decorate(descriptor, {
+            peel: peelList
+        }, TYPE_FN)
+
+        var old = descriptor.value
+        descriptor.value = function(...args){
+            args.forEach((arg, i) => {
+                typeof arg === 'object'
+                && peelList[i]
+                && (args[i] = peel(arg, peelList[i]))
+            })
+            return old.call(this, ...args)
+        }
+    }
+}
+
+function peel(obj, str) {
+    let r = obj
+    str = str.split('->')
+    str.forEach(x => r = obj[x])
+    return r === undefined ? obj : r
+}
+
+export function ItemAccess(){
+    return function(target, name, descriptor){
+        decorate(descriptor, {
+            itemAccess: true
+        }, TYPE_FN)
+    }
+}
+
 function decorate(descriptor, value, type = false){
     if (descriptor.set) {
         throw('You tried to apply a decorator to a setter which is not allowed.');

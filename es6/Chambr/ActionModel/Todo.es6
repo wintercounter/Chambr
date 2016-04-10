@@ -1,7 +1,7 @@
 import Abstract from '../ModelAbstract.es6'
 import Chambr from '../Worker.es6'
 import DB from '../Adapters/CouchDB.es6'
-import { Default, On, Trigger } from '../Decorators.es6'
+import { Default, On, Trigger, Peel, ItemAccess } from '../Decorators.es6'
 
 export default class Todo extends Abstract {
 
@@ -63,6 +63,8 @@ export default class Todo extends Abstract {
 		}
 	}
 
+	@ItemAccess()
+	@Peel('item->id')
 	async delete(id){
 		try {
 			let doc = await this._db.local.get(id)
@@ -93,9 +95,7 @@ export default class Todo extends Abstract {
 	}
 
 	all(status){
-		for (let i in this.modelData) {
-			this.set(this.modelData[i].id, 'status', status)
-		}
+		this.modelData.forEach(item => this.set(item.id, 'status', status))
 	}
 }
 

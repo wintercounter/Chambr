@@ -58,7 +58,6 @@ let instance = new class Chambr {
                 model.trigger(responseSoft ? 'soft' : 'hard', d)
                 !responseSoft && model.trigger('updated', d)
                 responseState && model.trigger(responseState, d)
-                modelEvent.data.responseState && model.trigger(modelEvent.data.responseState, modelEvent.data)
             })
         })
     }
