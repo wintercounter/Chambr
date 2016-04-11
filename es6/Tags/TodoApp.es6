@@ -42,13 +42,8 @@ new class TodoApp extends Abstract {
 
 function context(){
 	this.status = 'all'
-	let Todo = this.$.Todo
+	let Todo = this.$.Todo()
 
-	Todo()
-
-	Todo.on(ev => console.log(ev))
-
-	Todo.load()
 	Todo.on('updated', this.update)
 
 	this.keyup = ev => {

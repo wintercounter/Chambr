@@ -84,15 +84,15 @@ let instance = new class Chambr {
 
         if (apiData.type === 'fn') {
             value = function(...argList){
-                console.log('humi', this, method)
                 this && this.trigger && this.trigger(method)
-                return new Promise((resolve, reject) => {
+                let p = new Promise((resolve, reject) => {
                     that._promises[++that._requestId] = { resolve, reject }
                     HW.pub(`Chambr->${name}->${method}`, {
                         argList: [].slice.call(argList, 0),
                         requestId: that._requestId
                     })
                 })
+                return (method === 'constructor') ? that._basket[name] : p
             }
         }
 

@@ -79,12 +79,11 @@ HW.sub('Chambr', function(ChambrEvent){
     let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
     let method  = model ? model[route[2]] : false
     if (method) {
-        let r = isConstructor
-            ? Promise.resolve({
-                soft: false,
-                state: 'constructed'
-            })
-            : method.apply(model, argList)
+        if (isConstructor) {
+            Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, {}, {}, true)
+            return
+        }
+        let r = method.apply(model, argList)
         try {
             r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
             .catch(o => Chambr.Reject (ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
