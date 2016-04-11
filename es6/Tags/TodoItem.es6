@@ -7,9 +7,9 @@ const ESC_KEY = 27
 new class TodoItem extends Abstract {
 
 	get template(){ return `
-<input class="toggle" type="checkbox" onchange="{ change }"  __checked="{ opts.status == 'completed' }">
+<input class="toggle" type="checkbox" onchange="{ $.Todo.toggle }"  __checked="{ opts.status == 'completed' }">
 <label if="{ !editing }" ondblclick="{ dblclick }">{ opts.text }</label>
-<button class="destroy" onclick="{ delete }"></button>
+<button class="destroy" onclick="{ $.Todo.delete }"></button>
 <input if="{ editing }" name="input" class="edit" value="{ opts.text }" onblur="{ blur }" onkeyup="{ keyup }">
 `}
 
@@ -18,7 +18,8 @@ new class TodoItem extends Abstract {
 	}
 }
 
-function context(){
+function context(opts){
+	let Todo = this.$.Todo
 	this.editing = false
 
 	this.dblclick = ev => {
@@ -29,40 +30,29 @@ function context(){
 	}
 
 	this.keyup = ev => {
-		if (ev.keyCode === ENTER_KEY || ev.keyCode === ESC_KEY) {
-			if (ev.keyCode === ENTER_KEY) {
-				this.edit(ev.target.value.trim())
+		let key = ev.keyCode
+		let el  = ev.target
+
+		if (key === ENTER_KEY || key === ESC_KEY) {
+			switch (key) {
+				default:
+					this.editing = false
+					this.root.classList.remove('editing')
+				case ENTER_KEY:
+					Todo.set(opts.id, 'text', el.value.trim())
+					break
+				case ESC_KEY:
+					el.blur()
+					el.value = opts.text
+					break
 			}
-			else if (ev.keyCode === ESC_KEY) {
-				ev.target.blur()
-				ev.target.value = this.opts.text
-			}
-			this.editing = false
-			this.root.classList.remove('editing')
 		}
 	}
 
 	this.blur = ev => {
-		let v = ev.target.value.trim()
-
-		if (!v) {
-			this.delete()
-		}
-		else {
-			this.edit(v)
-		}
-
+		!v && Todo.delete(opts.id)
+		 v && Todo.set(opts.id, 'text', ev.target.value.trim())
 		this.editing = false
-		this.update()
 	}
-
-	this.change = ev => {
-		let t = ev.target
-		let c = t.checked
-		this.$.Todo.set(this.opts.id, 'status', c ? 'completed' : 'uncompleted')
-	}
-
-	this.edit = text => this.$.Todo.set(this.opts.id, 'text', text)
-	this.delete = ev => this.$.Todo.delete(this.opts.id)
 }
 

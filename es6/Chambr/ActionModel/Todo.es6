@@ -1,7 +1,10 @@
 import Abstract from '../ModelAbstract.es6'
 import Chambr from '../Worker.es6'
 import DB from '../Adapters/CouchDB.es6'
-import { Default, On, Trigger, Peel, ItemAccess } from '../Decorators.es6'
+import { Default, On, Trigger, Peel } from '../Decorators.es6'
+
+const STATUS_COMPLETED   = 'completed'
+const STATUS_UNCOMPLETED = 'uncompleted'
 
 export default class Todo extends Abstract {
 
@@ -49,12 +52,17 @@ export default class Todo extends Abstract {
 	}
 
 	async add(text){
+		text = text.trim()
+		if (!text) {
+			return this.reject('Text cannot be empty.')
+		}
+
 		try {
 			let date = parseInt(new Date().getTime() / 1000, 10)
 			await this._db.local.put({
 				_id: `doc-${date}`,
 				text,
-				status: 'uncompleted'
+				status: STATUS_UNCOMPLETED
 			})
 			return this.resolve()
 		}
@@ -63,8 +71,7 @@ export default class Todo extends Abstract {
 		}
 	}
 
-	@ItemAccess()
-	@Peel('item->id')
+	@Peel('item->v->id')
 	async delete(id){
 		try {
 			let doc = await this._db.local.get(id)
@@ -88,14 +95,22 @@ export default class Todo extends Abstract {
 		}
 	}
 
-	clear(){
-		this.modelData
-			.filter(item => d.doc.status === 'completed')
-			.forEach(item => this.delete(item.id))
+	@Peel('item->v->id')
+	async toggle(id){
+		let doc = await this._db.local.get(id)
+		return await this.set(id, 'status', doc.status === STATUS_UNCOMPLETED ? STATUS_COMPLETED : STATUS_UNCOMPLETED)
 	}
 
-	all(status){
-		this.modelData.forEach(item => this.set(item.id, 'status', status))
+	@Peel('target->checked')
+	toggleAll(isCompleted = false){
+		this.modelData.forEach(item => this.set(item.id, 'status', isCompleted ? STATUS_COMPLETED : STATUS_UNCOMPLETED))
+	}
+
+	@Peel(null)
+	clear(){
+		this.modelData
+			.filter(item => item.doc.status === STATUS_COMPLETED)
+			.forEach(item => this.delete(item.id))
 	}
 }
 

@@ -9,10 +9,11 @@ export function Default(v){
     }
 }
 
-export function Trigger(){
+export function Trigger(ev = 'updated'){
     return function(target, name, descriptor){
         var old = descriptor.value
         descriptor.value = function(...args){
+            this.trigger(ev)
             return old.call(this, ...args)
         }
     }
@@ -28,33 +29,31 @@ export function On(event){
 
 export function Peel(...peelList){
     return function(target, name, descriptor){
-        decorate(descriptor, {
-            peel: peelList
-        }, TYPE_FN)
-
         var old = descriptor.value
         descriptor.value = function(...args){
             args.forEach((arg, i) => {
-                typeof arg === 'object'
-                && peelList[i]
-                && (args[i] = peel(arg, peelList[i]))
+                if (peelList[i] === null) {
+                    args[i] = null
+                }
+                else if (typeof arg === 'object' && peelList[i]) {
+                    try {
+                        let r = arg
+                        let str = peelList[i].split('->')
+                        str.forEach(x => r = r[x])
+                        if (r === undefined) throw 'e'
+                        args[i] = r
+                    }
+                    catch(e){}
+                }
             })
             return old.call(this, ...args)
         }
-    }
-}
 
-function peel(obj, str) {
-    let r = obj
-    str = str.split('->')
-    str.forEach(x => r = obj[x])
-    return r === undefined ? obj : r
-}
-
-export function ItemAccess(){
-    return function(target, name, descriptor){
         decorate(descriptor, {
-            itemAccess: true
+            peel: {
+                list: peelList,
+                fn: descriptor.value.toString()
+            }
         }, TYPE_FN)
     }
 }

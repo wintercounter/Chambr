@@ -1,8 +1,6 @@
 import Chambr from './Worker.es6'
 import Observable from 'riot-observable'
 
-const BASKET = {}
-
 export default class Abstract {
 
     set modelData(o){

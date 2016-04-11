@@ -1,0 +1,22 @@
+/*
+
+app-template.css overrides
+
+remove this comment if used
+remove this file if not
+
+*/
+
+todo-app {
+	display: block
+}
+
+input.edit {
+	width: calc(100% - 45px);
+	margin-left: 45px;
+	display: block !important;
+}
+
+button {
+	cursor: pointer;
+}

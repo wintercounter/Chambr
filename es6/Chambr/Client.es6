@@ -82,19 +82,10 @@ let instance = new class Chambr {
         let method = apiData.name
         let value = undefined
 
-        for (let decorator in apiData.decorators) {
-            if (!apiData.decorators.hasOwnProperty(decorator)) continue;
-            switch(decorator){
-                case 'default':
-                    value = apiData.decorators[decorator]
-                    break;
-                default: break;
-            }
-        }
-
         if (apiData.type === 'fn') {
-            return function(...argList){
-                this.trigger && this.trigger(method)
+            value = function(...argList){
+                console.log('humi', this, method)
+                this && this.trigger && this.trigger(method)
                 return new Promise((resolve, reject) => {
                     that._promises[++that._requestId] = { resolve, reject }
                     HW.pub(`Chambr->${name}->${method}`, {
@@ -104,9 +95,24 @@ let instance = new class Chambr {
                 })
             }
         }
-        else if (apiData.type === 'var') {
-            return value
+
+        for (let decorator in apiData.decorators) {
+            if (!apiData.decorators.hasOwnProperty(decorator)) continue;
+            let descriptor = apiData.decorators[decorator]
+            switch(decorator){
+                case 'default':
+                    value = descriptor
+                    break;
+                case 'peel':
+                    let old = value
+                    let peelList = descriptor.list
+                    eval(`value = ${descriptor.fn}`)
+                    break;
+                default: break;
+            }
         }
+
+        return value
     }
 }
 
