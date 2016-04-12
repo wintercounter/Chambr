@@ -9,7 +9,7 @@
   "author": "Victor Vincent <wintercounter>",
   "license": "MIT",
   "dependencies": {
-    "hwjs": "^1.0.0"
+    "hwjs": "^0.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.4.5",

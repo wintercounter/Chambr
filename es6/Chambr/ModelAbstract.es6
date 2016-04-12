@@ -1,7 +1,7 @@
 import Chambr from './Worker.es6'
 import Observable from 'riot-observable'
 
-export default class Abstract {
+export default class ModelAbstract {
 
     set modelData(o){
         this._data = o

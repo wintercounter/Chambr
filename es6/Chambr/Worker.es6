@@ -11,18 +11,39 @@ export default class Chambr {
         MODEL_LIBRARY[model.name] = model
 
         let api = []
-        Object.getOwnPropertyNames(model.prototype)
-            .forEach((prop) => {
-                if (prop !== 'constructor' && prop.charAt(0) !== '_'){
-                    let descriptor = Object.getOwnPropertyDescriptor(model.prototype, prop)
+        let tmpModel = model.prototype
 
-                    api.push({
-                        name: prop,
-                        type: descriptor.get ? 'var' : 'fn',
-                        decorators: descriptor.get ? descriptor.get.decorators : descriptor.value.decorators
-                    })
-                }
-            })
+        do {
+            Object.getOwnPropertyNames(tmpModel)
+                .forEach((prop) => {
+                    if (
+                        api.findIndex(v => v.name === prop) === -1
+                        && prop !== 'constructor'
+                        && prop.charAt(0) !== '_'
+                    ){
+                        let descriptor = Object.getOwnPropertyDescriptor(tmpModel, prop)
+
+                        api.push({
+                            name: prop,
+                            type: descriptor.get ? 'var' : 'fn',
+                            decorators: descriptor.get ? descriptor.get.decorators : descriptor.value.decorators
+                        })
+                    }
+                })
+
+            tmpModel = tmpModel.__proto__
+
+            if (
+                tmpModel
+                && tmpModel.constructor
+                && tmpModel.constructor.name !== 'ModelAbstract'
+                && tmpModel.constructor.name !== 'Object'
+            ) {}
+            else {
+                tmpModel = false
+            }
+        } while (tmpModel)
+
 
         model.prototype._exposedApi = api
 

@@ -1,4 +1,4 @@
-import Abstract from '../ModelAbstract.es6'
+import ModelAbstract from '../ModelAbstract.es6'
 import Chambr from '../Worker.es6'
 import DB from '../Adapters/CouchDB.es6'
 import { Default, On, Trigger, Peel } from '../Decorators.es6'
@@ -6,7 +6,7 @@ import { Default, On, Trigger, Peel } from '../Decorators.es6'
 const STATUS_COMPLETED   = 'completed'
 const STATUS_UNCOMPLETED = 'uncompleted'
 
-export default class Todo extends Abstract {
+export default class Todo extends ModelAbstract {
 
 	cache;
 
