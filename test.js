@@ -1,3 +1,0 @@
-
-
-postMessage({dates: 12})

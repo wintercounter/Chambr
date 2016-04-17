@@ -1,11 +1,41 @@
+import ModelAbstract from './ModelAbstract.es6'
+
 const MODEL_LIBRARY = {}
 const MODEL_INSTANCES = {}
 
-let HW = self.HW
+var HW = undefined
 
 export default class Chambr {
 
-    static get Model(){}
+    constructor(HighwayInstance){
+        HW = HighwayInstance
+        HW.sub('Chambr', function(ChambrEvent){
+            let ev      = ChambrEvent.data
+            let route   = ChambrEvent.name.split('->')
+            let argList = Object.values(ev.argList)
+            let isConstructor = route[2] === 'constructor'
+            let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
+            let method  = model ? model[route[2]] : false
+            if (method) {
+                if (isConstructor) {
+                    Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, {}, {}, true)
+                    return
+                }
+                let r = method.apply(model, argList)
+                try {
+                    r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+                     .catch(o => Chambr.Reject(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+                }
+                catch(e){
+                    Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), r, true)
+                }
+            }
+        })
+    }
+
+    static get Model(){
+        return ModelAbstract
+    }
 
     static set Model(model) {
         MODEL_LIBRARY[model.name] = model
@@ -91,26 +121,3 @@ export default class Chambr {
         return results
     }
 }
-
-HW.sub('Chambr', function(ChambrEvent){
-    let ev      = ChambrEvent.data
-    let route   = ChambrEvent.name.split('->')
-    let argList = Object.values(ev.argList)
-    let isConstructor = route[2] === 'constructor'
-    let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
-    let method  = model ? model[route[2]] : false
-    if (method) {
-        if (isConstructor) {
-            Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, {}, {}, true)
-            return
-        }
-        let r = method.apply(model, argList)
-        try {
-            r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
-            .catch(o => Chambr.Reject (ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
-        }
-        catch(e){
-            Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), r, true)
-        }
-    }
-})

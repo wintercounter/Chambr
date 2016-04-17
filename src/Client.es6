@@ -1,9 +1,8 @@
-// import Interface from './Interface.es6'
 import Observable from 'riot-observable'
 
-const HW = self.HW
+var HW = undefined
 
-let instance = new class Chambr {
+export default class Chambr {
 
     _requestId = 0
 
@@ -11,15 +10,20 @@ let instance = new class Chambr {
 
     _basket = {}
 
-    get basket(){
+    get HW(){
+        return HW
+    }
+
+    get $(){
         return this._basket
     }
 
-    constructor(){
+    constructor(HighwayInstance){
+        HW = HighwayInstance
         HW.sub('Chambr->Expose', exposeEvent => {
             ci('Chambr: Incoming expose', exposeEvent)
             let exposeData =  exposeEvent.data
-            let model = this.basket[exposeData.modelName] = this.applyApi(exposeData)
+            let model = this.$[exposeData.modelName] = this.applyApi(exposeData)
 
             HW.sub(`Chambr->${exposeData.modelName}`, modelEvent => {
                 let d             = modelEvent.data
@@ -49,7 +53,7 @@ let instance = new class Chambr {
                 }
 
                 for (let name in modelExport){
-                    // No has own prop needed!
+                    // No has own prop check needed!
                     model[name] = modelExport[name]
                 }
 
@@ -115,5 +119,3 @@ let instance = new class Chambr {
         return value
     }
 }
-
-export default instance.basket
