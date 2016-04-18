@@ -21,7 +21,7 @@ export default class Chambr {
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('Chambr->Expose', exposeEvent => {
-            ci('Chambr: Incoming expose', exposeEvent)
+            console.info('Chambr: Incoming expose', exposeEvent)
             let exposeData =  exposeEvent.data
             let model = this.$[exposeData.modelName] = this.applyApi(exposeData)
 

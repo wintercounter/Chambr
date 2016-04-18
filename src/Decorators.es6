@@ -14,7 +14,7 @@ export function Trigger(ev = 'updated'){
         var old = descriptor.value
         descriptor.value = function(...args){
             let r = old.call(this, ...args)
-            if (r.then) {
+            if (r && r.then) {
                 r.then(() => {
                     this.trigger(ev)
                 })

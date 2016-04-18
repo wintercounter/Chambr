@@ -6,11 +6,13 @@ var _ = require('lodash');
 
 var config = {
   client: {
+    standalone: 'ChambrClient',
     entryFile: './src/Client.es6',
     outputDir: './',
     outputFile: 'Client.js'
   },
   worker: {
+    standalone: 'ChambrWorker',
     entryFile: './src/Worker.es6',
     outputDir: './',
     outputFile: 'Worker.js'
@@ -30,7 +32,10 @@ var config = {
 }
 
 function bundle(c) {
-  return browserify(c.entryFile, _.extend({ debug: true }))
+  return browserify(c.entryFile, {
+      debug: true,
+      standalone: c.standalone
+    })
     .transform(babelify, {
         presets: ["es2015"],
         plugins: [
@@ -64,14 +69,6 @@ gulp.task('build-test-worker', function() {
   return bundle(config.test.worker);
 });
 
-gulp.task('build', ['build-client', 'build-worker'], function() {
-  process.exit(0);
-});
-
-gulp.task('build-test', ['build-test-client', 'build-test-worker'], function() {
-  process.exit(0);
-});
-
-gulp.task('build-all', ['build', 'build-test'], function() {
-  process.exit(0);
-});
+gulp.task('build', ['build-client', 'build-worker']);
+gulp.task('build-test', ['build-test-client', 'build-test-worker']);
+gulp.task('build-all', ['build', 'build-test']);

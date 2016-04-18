@@ -1,14 +1,23 @@
 import 'babel-polyfill'
-import Highway from './Highway.es6'
+import Highway from 'Highway'
 import Chambr from '../src/Client.es6'
 let Host = new self.Worker('./Test.Worker.js')
 let HW = new Highway(Host)
 let CH = new Chambr(HW)
-console.info('Site engine started.')
 
-/**
- * Wait for worker to be ready
- */
-HW.sub('Worker->Ready', () => {
-    console.log(CH)
+self.$ = CH.$
+
+mocha.setup({
+    ui: 'tdd'
 })
+
+HW.sub('*', function(){
+    console.log(arguments)
+})
+
+HW.sub('Worker->Ready', () => {
+    console.info('Start test')
+    mocha.run()
+})
+
+console.info('Site engine started.')
