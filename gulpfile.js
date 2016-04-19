@@ -19,12 +19,12 @@ var config = {
   },
   test: {
     client: {
-      entryFile: './test/Client.es6',
+      entryFile: './test/Test.Client.es6',
       outputDir: './test/',
       outputFile: 'Test.Client.js'
     },
     worker: {
-      entryFile: './test/Worker.es6',
+      entryFile: './test/Test.Worker.es6',
       outputDir: './test/',
       outputFile: 'Test.Worker.js'
     }

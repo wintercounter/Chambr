@@ -1,12 +1,13 @@
 "use strict"
 
 var assert = chai.assert
-var Test
+var Test, TestExt
 
 suite('Chambr', function() {
 
 	setup(function(){
-		Test = Test || $.Test
+		Test    = Test || $.Test
+		TestExt = TestExt || $.TestExtended
 	})
 
 	teardown(function(){
@@ -28,6 +29,11 @@ suite('Chambr', function() {
 
 	test('model has no private method', function(done){
 		assert.isUndefined(Test._calcPrivate)
+		done()
+	})
+
+	test('model has defaults', function(done){
+		assert.equal(-1, Test.total)
 		done()
 	})
 
@@ -66,5 +72,46 @@ suite('Chambr', function() {
 			assert.equal('two', Test[0])
 			done()
 		})
+	})
+
+	test('model total', function(done){
+		assert.equal(2, Test.total)
+		done()
+	})
+
+	test('model @Trigger customEvent', function(done){
+		Test.one('customEvent', function(){
+			done()
+		})
+		Test.delete(10)
+	})
+
+	test('model @On triggerer', function(done){
+		Test.one('remoteUpdated', function(){
+			done()
+		})
+		Test.triggerOnTest()
+	})
+
+	test('model @Peel', function(done){
+		var ev = {
+			item: {
+				value: 'four'
+			}
+		}
+		Test.create(ev).then(function(){
+			assert.equal('four', Test[2])
+			done()
+		})
+	})
+
+	test('extended model', function(done){
+		assert.isOk($.hasOwnProperty('TestExtended'))
+		assert.isFunction(TestExt.create)
+		assert.isFunction(TestExt.read)
+		assert.isFunction(TestExt.update)
+		assert.isFunction(TestExt.delete)
+		assert.isFunction(TestExt.extended)
+		done()
 	})
 })

@@ -13,15 +13,21 @@ export function Trigger(ev = 'updated'){
     return function(target, name, descriptor){
         var old = descriptor.value
         descriptor.value = function(...args){
+            console.warn(1)
             let r = old.call(this, ...args)
             if (r && r.then) {
                 r.then(() => {
+                    console.warn(3)
                     this.trigger(ev)
+                    console.warn(6)
                 })
             }
             else {
+                console.warn(4)
                 this.trigger(ev)
+                console.warn(5)
             }
+            console.warn(2)
             return r
         }
     }

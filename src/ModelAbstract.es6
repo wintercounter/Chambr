@@ -14,7 +14,7 @@ export default class ModelAbstract {
     constructor(){
         Observable(this)
         this.on('*', (name, data) => {
-            let onTriggers = this._onTriggerEventHandlers[name]
+            let onTriggers = this._onTriggerEventHandlers ? this._onTriggerEventHandlers[name] : false
             let promises = []
             onTriggers && onTriggers.forEach(method => {
                 let p = this[method].call(this, name, data)

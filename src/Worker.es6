@@ -3,10 +3,15 @@ import ModelAbstract from './ModelAbstract.es6'
 const MODEL_LIBRARY = {}
 const MODEL_INSTANCES = {}
 
+/** @type {Highway} */
 var HW = undefined
 
 export default class Chambr {
 
+	/**
+	 * 
+     * @param HighwayInstance {Highway}
+     */
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('Chambr', function(ChambrEvent){
@@ -33,10 +38,14 @@ export default class Chambr {
         })
     }
 
+    /** @returns {ModelAbstract} */
     static get Model(){
         return ModelAbstract
     }
 
+    /**
+     * @param model {ModelAbstract}
+     */
     static set Model(model) {
         MODEL_LIBRARY[model.name] = model
 
