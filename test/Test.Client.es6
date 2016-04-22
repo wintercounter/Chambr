@@ -7,14 +7,6 @@ let CH = new Chambr(HW)
 
 self.$ = CH.$
 
-mocha.setup({
-    ui: 'tdd'
-})
-
-HW.sub('*', function(){
-    console.log(arguments)
-})
-
 HW.sub('Worker->Ready', () => {
     console.info('Start test')
     mocha.run()

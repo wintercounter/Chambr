@@ -40,6 +40,7 @@ function bundle(c) {
         presets: ["es2015"],
         plugins: [
           "transform-class-properties",
+          "transform-object-assign",
           "syntax-decorators",
           "transform-decorators-legacy",
           "syntax-async-functions",

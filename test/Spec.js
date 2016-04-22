@@ -3,6 +3,10 @@
 var assert = chai.assert
 var Test, TestExt
 
+mocha.setup({
+	ui: 'tdd'
+})
+
 suite('Chambr', function() {
 
 	setup(function(){

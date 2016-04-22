@@ -14,25 +14,26 @@ export default class Chambr {
      */
     constructor(HighwayInstance){
         HW = HighwayInstance
-        HW.sub('Chambr', function(ChambrEvent){
+        HW.sub('ChambrWorker', function(ChambrEvent){
             let ev      = ChambrEvent.data
             let route   = ChambrEvent.name.split('->')
             let argList = Object.values(ev.argList)
             let isConstructor = route[2] === 'constructor'
             let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
             let method  = model ? model[route[2]] : false
+            let responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient')
             if (method) {
                 if (isConstructor) {
-                    Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, {}, {}, true)
+                    Chambr.Resolve(responseEventName, ev.requestId, model.modelData, {}, {}, true)
                     return
                 }
                 let r = method.apply(model, argList)
                 try {
-                    r.then(o => Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
-                     .catch(o => Chambr.Reject(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+                    r.then(o => Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+                     .catch(o => Chambr.Reject(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
                 }
                 catch(e){
-                    Chambr.Resolve(ChambrEvent.name, ev.requestId, model.modelData, Chambr.Export(model), r, true)
+                    Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), r, true)
                 }
             }
         })
@@ -47,10 +48,10 @@ export default class Chambr {
      * @param model {ModelAbstract}
      */
     static set Model(model) {
-        MODEL_LIBRARY[model.name] = model
-
         let api = []
         let tmpModel = model.prototype
+        let modelName = extractFunctionName(model)
+        MODEL_LIBRARY[modelName] = model
 
         do {
             Object.getOwnPropertyNames(tmpModel)
@@ -75,19 +76,18 @@ export default class Chambr {
             if (
                 tmpModel
                 && tmpModel.constructor
-                && tmpModel.constructor.name !== 'ModelAbstract'
-                && tmpModel.constructor.name !== 'Object'
+                && extractFunctionName(tmpModel.constructor) !== 'ModelAbstract'
+                && extractFunctionName(tmpModel.constructor) !== 'Object'
             ) {}
             else {
                 tmpModel = false
             }
         } while (tmpModel)
 
-
         model.prototype._exposedApi = api
 
-        HW.pub('Chambr->Expose', {
-            modelName: model.name,
+        HW.pub('ChambrClient->Expose', {
+            modelName: modelName,
             modelApi: api
         })
     }
@@ -129,4 +129,8 @@ export default class Chambr {
         })
         return results
     }
+}
+
+function extractFunctionName(fn){
+    return fn.toString().match(/function\W+([\w$_]+?)\(/)[1]
 }

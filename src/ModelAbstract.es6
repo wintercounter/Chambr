@@ -33,7 +33,7 @@ export default class ModelAbstract {
     }
 
     broadcast(name, data = undefined, soft = true){
-        Chambr.Resolve(`Chambr->${this.constructor.name}->Event`, -1, this.modelData, Chambr.Export(this), data, soft, name)
+        Chambr.Resolve(`ChambrClient->${this.constructor.name}->Event`, -1, this.modelData, Chambr.Export(this), data, soft, name)
     }
 
     resolve(data = undefined, soft = false, state = 'resolve'){

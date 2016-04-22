@@ -1,5 +1,6 @@
 import Chambr from '../src/Worker.es6'
 import { Trigger, Default, On, Peel } from '../src/Decorators.es6'
+//import LocalStorage from '../src/Adapter/LocalStorage.es6'
 
 /**
  * @extends ModelAbstract
@@ -14,6 +15,11 @@ class Test extends Chambr.Model {
 	constructor(){
 		super()
 		this.modelData = ['one', 'two']
+
+		//let x = new LocalStorage(this, 'main/hula')
+		//x.set('kula/hula/suna/hajjaj', 'cunci')
+		//x.set('kula/hula/suna/cullon', 'callop')
+		//console.log(x.get('kula/hula'))
 	}
 
 	@Peel('item->value')

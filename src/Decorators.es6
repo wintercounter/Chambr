@@ -13,21 +13,13 @@ export function Trigger(ev = 'updated'){
     return function(target, name, descriptor){
         var old = descriptor.value
         descriptor.value = function(...args){
-            console.warn(1)
             let r = old.call(this, ...args)
             if (r && r.then) {
-                r.then(() => {
-                    console.warn(3)
-                    this.trigger(ev)
-                    console.warn(6)
-                })
+                r.then(() => this.trigger(ev))
             }
             else {
-                console.warn(4)
                 this.trigger(ev)
-                console.warn(5)
             }
-            console.warn(2)
             return r
         }
     }
@@ -69,6 +61,23 @@ export function Peel(...peelList){
                 fn: descriptor.value.toString()
             }
         }, TYPE_FN)
+    }
+}
+
+export function GetSet(obj){
+    for (let i in obj) {
+        obj[i] = {
+            get: function(){
+                return this[obj[i]]
+            },
+            set: function(o){
+                this[obj[i]] = o
+            }
+        }
+    }
+
+    return function(target){
+        Object.defineProperties(target, obj)
     }
 }
 

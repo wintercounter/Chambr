@@ -20,12 +20,12 @@ export default class Chambr {
 
     constructor(HighwayInstance){
         HW = HighwayInstance
-        HW.sub('Chambr->Expose', exposeEvent => {
+        HW.sub('ChambrClient->Expose', exposeEvent => {
             console.info('Chambr: Incoming expose', exposeEvent)
             let exposeData =  exposeEvent.data
             let model = this.$[exposeData.modelName] = this.applyApi(exposeData)
 
-            HW.sub(`Chambr->${exposeData.modelName}`, modelEvent => {
+            HW.sub(`ChambrClient->${exposeData.modelName}`, modelEvent => {
                 let d             = modelEvent.data
                 let responseState = d.responseState
                 let responseId    = d.responseId
@@ -91,7 +91,7 @@ export default class Chambr {
                 this && this.trigger && this.trigger(method)
                 let p = new Promise((resolve, reject) => {
                     that._promises[++that._requestId] = { resolve, reject }
-                    HW.pub(`Chambr->${name}->${method}`, {
+                    HW.pub(`ChambrWorker->${name}->${method}`, {
                         argList: [].slice.call(argList, 0),
                         requestId: that._requestId
                     })
