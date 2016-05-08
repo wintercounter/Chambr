@@ -1,5 +1,5 @@
 import Chambr from '../src/Worker.es6'
-import { Trigger, Default, On, Peel } from '../src/Decorators.es6'
+import { Trigger, Default, On, Peel } from '../src/Decorator.es6'
 //import LocalStorage from '../src/Adapter/LocalStorage.es6'
 
 /**

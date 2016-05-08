@@ -17,6 +17,12 @@ var config = {
     outputDir: './',
     outputFile: 'Worker.js'
   },
+  decorator: {
+    standalone: 'ChambrDecorator',
+    entryFile: './src/Decorator.es6',
+    outputDir: './',
+    outputFile: 'Decorator.js'
+  },
   test: {
     client: {
       entryFile: './test/Test.Client.es6',
@@ -58,8 +64,12 @@ gulp.task('build-client', function() {
   return bundle(config.client);
 });
 
-gulp.task('build-worker', function() {
+gulp.task('build-worker', ['build-decorator'], function() {
   return bundle(config.worker);
+});
+
+gulp.task('build-decorator', function() {
+  return bundle(config.decorator);
 });
 
 gulp.task('build-test-client', function() {
