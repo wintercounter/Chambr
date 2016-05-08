@@ -56,7 +56,8 @@ export function Peel(...peelList){
                     catch(e){}
                 }
             })
-            return old.call(this, ...finalArgs)
+            finalArgs.forEach((v, i) => args[i] = v)
+            return old.call(this, ...args)
         }
 
         decorate(descriptor, {
