@@ -81,6 +81,14 @@ export function GetSet(obj){
     }
 }
 
+export function Empty(){
+    return function(target, name, descriptor){
+        decorate(descriptor, {
+            empty: true
+        }, TYPE_FN)
+    }
+}
+
 function decorate(descriptor, value, type = false){
     if (descriptor.set) {
         throw('You tried to apply a decorator to a setter which is not allowed.');

@@ -103,14 +103,20 @@ export default class Chambr {
         for (let decorator in apiData.decorators) {
             if (!apiData.decorators.hasOwnProperty(decorator)) continue;
             let descriptor = apiData.decorators[decorator]
+            let old = value
+
             switch(decorator){
                 case 'default':
                     value = descriptor
                     break;
                 case 'peel':
-                    let old = value
                     let peelList = descriptor.list
                     eval(`value = ${descriptor.fn}`)
+                    break;
+                case 'empty':
+                    value = function emptyDecorator(){
+                        old()
+                    }
                     break;
                 default: break;
             }
