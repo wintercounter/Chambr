@@ -37,14 +37,17 @@ export function Peel(...peelList){
     return function(target, name, descriptor){
         var old = descriptor.value
         descriptor.value = function(...args){
-            args.forEach((arg, i) => {
-                if (peelList[i] === null) {
-                    args[i] = null
+            peelList.forEach((peel, i) => {
+                let peelArgIndex = i
+                if (peel.indexOf(':')+1) {
+                    let tmp = peel.split(':')
+                    peelArgIndex = tmp[0]
+                    peel = tmp[1]
                 }
-                else if (typeof arg === 'object' && peelList[i]) {
+                if (typeof args[peelArgIndex] === 'object') {
                     try {
-                        let r = arg
-                        let str = peelList[i].split('->')
+                        let r = args[peelArgIndex]
+                        let str = peel.split('->')
                         str.forEach(x => r = r[x])
                         if (r === undefined) throw 'e'
                         args[i] = r
