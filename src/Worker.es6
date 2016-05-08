@@ -24,8 +24,7 @@ export default class Chambr {
             let responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient')
             if (method) {
                 if (isConstructor) {
-                    Chambr.Resolve(responseEventName, ev.requestId, model.modelData, {}, {}, true)
-                    return
+                    return Chambr.Resolve(responseEventName, ev.requestId, model.modelData, {}, {})
                 }
                 let r = method.apply(model, argList)
                 try {
@@ -87,6 +86,7 @@ export default class Chambr {
         model.prototype._exposedApi = api
 
         HW.pub('ChambrClient->Expose', {
+            modelData: model.DefaultData,
             modelName: modelName,
             modelApi: api
         })

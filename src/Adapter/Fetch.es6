@@ -8,7 +8,7 @@ export const EV = {
 }
 
 export const STATE = {
-	CALM: 'state-calm',
+	CALM   : 'state-calm',
 	LOADING: 'state-calm'
 }
 

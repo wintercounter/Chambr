@@ -8,11 +8,12 @@ export default class ModelAbstract {
     }
 
     get modelData(){
-        return this._data || {}
+        return this._data
     }
 
     constructor(){
         Observable(this)
+        this.modelData = this.constructor.DefaultData
         this.on('*', (name, data) => {
             let onTriggers = this._onTriggerEventHandlers ? this._onTriggerEventHandlers[name] : false
             let promises = []
@@ -22,9 +23,7 @@ export default class ModelAbstract {
             })
 
             if (promises.length) {
-                Promise.all(promises).then(() => {
-                    this.broadcast(name, data, false)
-                })
+                Promise.all(promises).then(() => this.broadcast(name, data, false))
             }
             else {
                 this.broadcast(name, data)
