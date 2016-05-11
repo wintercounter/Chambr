@@ -1,6 +1,6 @@
 import 'babel-polyfill'
-import './InitChambrWorker.es6'
-import './Test.Model.es6'
+import './InitChambrWorker'
+import './Test.Model'
 
 console.info('Worker engine started.')
 

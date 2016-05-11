@@ -1,4 +1,4 @@
-import ObjectStorage, { EV, namespace, cache } from './ObjectStorage.es6'
+import ObjectStorage, { EV, namespace, cache } from './ObjectStorage'
 import localforage from 'localforage'
 
 export default class LocalStorage extends ObjectStorage {

@@ -1,4 +1,4 @@
-import ModelAbstract from './ModelAbstract.es6'
+import ModelAbstract from './ModelAbstract'
 
 const MODEL_LIBRARY = {}
 const MODEL_INSTANCES = {}
@@ -8,8 +8,8 @@ var HW = undefined
 
 export default class Chambr {
 
-	/**
-	 * 
+    /**
+     *
      * @param HighwayInstance {Highway}
      */
     constructor(HighwayInstance){

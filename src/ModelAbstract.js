@@ -1,4 +1,4 @@
-import Chambr from './Worker.es6'
+import Chambr from './Worker'
 import Observable from 'riot-observable'
 
 export default class ModelAbstract {
@@ -31,6 +31,7 @@ export default class ModelAbstract {
         })
     }
 
+    // TODO to private
     broadcast(name, data = undefined, soft = true){
         Chambr.Resolve(`ChambrClient->${this.constructor.name}->Event`, -1, this.modelData, Chambr.Export(this), data, soft, name)
     }

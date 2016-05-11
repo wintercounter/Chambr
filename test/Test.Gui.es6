@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import Highway from 'Highway'
-import Chambr from '../src/Client.es6'
-let Host = new self.Worker('./Test.Worker.js')
+import Chambr from '../dist/Gui'
+let Host = new self.Worker('./dist/Test.Worker')
 let HW = new Highway(Host)
 let CH = new Chambr(HW)
 

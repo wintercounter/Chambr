@@ -1,6 +1,6 @@
-import Chambr from '../src/Worker.es6'
-import { Trigger, Default, On, Peel } from '../src/Decorator.es6'
-//import LocalStorage from '../src/Adapter/LocalStorage.es6'
+import Chambr from '../dist/Worker'
+import { Trigger, Default, On, Peel } from '../dist/Decorator'
+//import LocalStorage from '../dist/Adapter/LocalStorage'
 
 /**
  * @extends ModelAbstract
@@ -15,17 +15,11 @@ class Test extends Chambr.Model {
 	constructor(){
 		super()
 		this.modelData = ['one', 'two']
-
-		//let x = new LocalStorage(this, 'main/hula')
-		//x.set('kula/hula/suna/hajjaj', 'cunci')
-		//x.set('kula/hula/suna/cullon', 'callop')
-		//console.log(x.get('kula/hula'))
 	}
 
 	@Peel('item->value')
 	create(value){
 		this.modelData.push(value)
-		
 		return this.resolve(this.modelData.length-1)
 	}
 
