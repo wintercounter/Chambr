@@ -1,5 +1,8 @@
 import Chambr from './Worker'
 import Observable from 'riot-observable'
+import { ACTION_SIMPLE, ACTION_COMPLEX} from './Storage'
+
+const _actionBuffer = Symbol()
 
 export default class ModelAbstract {
 
@@ -13,7 +16,11 @@ export default class ModelAbstract {
 
     constructor(){
         Observable(this)
+        this[_actionBuffer] = new Set()
         this.modelData = this.constructor.DefaultData
+        (this.modelData !== undefined) && this.modelData.on(`${ACTION_SIMPLE} ${ACTION_COMPLEX}`, ...args => {
+
+        })
         this.on('*', (name, data) => {
             let onTriggers = this._onTriggerEventHandlers ? this._onTriggerEventHandlers[name] : false
             let promises = []
