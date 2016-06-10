@@ -15,6 +15,7 @@ export default class Chambr {
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('ChambrWorker', function(ChambrEvent){
+            console.log(JSON.stringify(ChambrEvent))
             let ev      = ChambrEvent.data
             let route   = ChambrEvent.name.split('->')
             let argList = Object.values(ev.argList)

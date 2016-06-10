@@ -45,12 +45,12 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(6);
+	module.exports = __webpack_require__(8);
 
 
 /***/ },
 
-/***/ 6:
+/***/ 8:
 /***/ function(module, exports) {
 
 	"use strict"

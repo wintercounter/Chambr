@@ -1,19 +1,18 @@
 import observable from 'riot-observable'
 
-export const ACTION_SIMPLE  = 'action-simple'
-export const ACTION_COMPLEX = 'action-complex'
-export const UPDATE         = 'update'
+export const ACTION_SIMPLE_SET  = 'action-simple-set'
+export const ACTION_SIMPLE_DEL  = 'action-simple-delete'
+export const ACTION_COMPLEX     = 'action-complex'
+export const UPDATE             = 'update'
 
 const M = Map
 const S = Set
-const A = Array
-const O = Object
 
-export function Array(input = []){
+export function Arr(input = []){
 	return Simple(input)
 }
 
-export function Object(input = {}){
+export function Obj(input = {}){
 	return Simple(input)
 }
 
@@ -30,18 +29,18 @@ function Simple(type){
 	type = new Proxy(type, {
 		set: function(target, name, value){
 			let r = (target[name] = value)
-			type.trigger(ACTION_SIMPLE, name, value)
-			type.trigger(UPDATE)
+			// No need to trigger array length change
+			if (name === 'length') {
+				type.trigger(ACTION_SIMPLE_SET, name, value)
+				type.trigger(UPDATE)
+			}
 			return r
 		},
 		deleteProperty: function(target, name, value){
-			// On array we don't need delete, set will do the job perfectly.
-			if (!(target instanceof A)) {
-				let r = (target[name] = value)
-				type.trigger(ACTION_SIMPLE, name, value)
-				type.trigger(UPDATE)
-				return r
-			}
+			let r = (target[name] = value)
+			type.trigger(ACTION_SIMPLE_DEL, name, value)
+			type.trigger(UPDATE)
+			return r
 		}
 	})
 	return type

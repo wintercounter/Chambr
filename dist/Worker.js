@@ -35,6 +35,7 @@ var Chambr = function () {
 
         HW = HighwayInstance;
         HW.sub('ChambrWorker', function (ChambrEvent) {
+            console.log(JSON.stringify(ChambrEvent));
             var ev = ChambrEvent.data;
             var route = ChambrEvent.name.split('->');
             var argList = Object.values(ev.argList);

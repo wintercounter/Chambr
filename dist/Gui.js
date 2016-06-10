@@ -45,10 +45,12 @@ var Chambr = function () {
 
         HW = HighwayInstance;
         HW.sub('ChambrClient->Expose', function (exposeEvent) {
+            console.log(JSON.stringify(exposeEvent));
             var exposeData = exposeEvent.data;
             var model = _this.$[exposeData.modelName] = _this.applyApi(exposeData);
 
             HW.sub('ChambrClient->' + exposeData.modelName, function (modelEvent) {
+                console.log(JSON.stringify(modelEvent));
                 var d = modelEvent.data;
                 var responseState = d.responseState;
                 var responseId = d.responseId;

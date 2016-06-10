@@ -21,10 +21,12 @@ export default class Chambr {
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('ChambrClient->Expose', exposeEvent => {
+            console.log(JSON.stringify(exposeEvent))
             let exposeData = exposeEvent.data
             let model = this.$[exposeData.modelName] = this.applyApi(exposeData)
 
             HW.sub(`ChambrClient->${exposeData.modelName}`, modelEvent => {
+                console.log(JSON.stringify(modelEvent))
                 let d             = modelEvent.data
                 let responseState = d.responseState
                 let responseId    = d.responseId

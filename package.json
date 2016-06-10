@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "Highway": "^0.0.4",
+    "Highway": "^0.1.1",
     "babel-core": "^6.7.7",
     "babel-plugin-syntax-async-functions": "^6.5.0",
     "babel-plugin-syntax-decorators": "^6.5.0",

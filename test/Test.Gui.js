@@ -6,14 +6,18 @@ var _Highway = require('Highway');
 
 var _Highway2 = _interopRequireDefault(_Highway);
 
+var _WebWorker = require('Highway/dist/Proxy/WebWorker');
+
+var _WebWorker2 = _interopRequireDefault(_WebWorker);
+
 var _Gui = require('../dist/Gui');
 
 var _Gui2 = _interopRequireDefault(_Gui);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Host = new self.Worker('./dist/Test.Worker');
-var HW = new _Highway2.default(Host);
+var Host = new self.Worker('./dist/Test.Worker.js');
+var HW = new _Highway2.default(new _WebWorker2.default(Host));
 var CH = new _Gui2.default(HW);
 
 self.$ = CH.$;

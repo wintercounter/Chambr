@@ -45,12 +45,12 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(300);
+	module.exports = __webpack_require__(302);
 
 
 /***/ },
 
-/***/ 3:
+/***/ 4:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62,7 +62,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _ModelAbstract = __webpack_require__(4);
+	var _ModelAbstract = __webpack_require__(5);
 
 	var _ModelAbstract2 = _interopRequireDefault(_ModelAbstract);
 
@@ -90,6 +90,7 @@
 
 	        HW = HighwayInstance;
 	        HW.sub('ChambrWorker', function (ChambrEvent) {
+	            console.log(JSON.stringify(ChambrEvent));
 	            var ev = ChambrEvent.data;
 	            var route = ChambrEvent.name.split('->');
 	            var argList = Object.values(ev.argList);
@@ -226,7 +227,7 @@
 
 /***/ },
 
-/***/ 4:
+/***/ 5:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -238,17 +239,23 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _Worker = __webpack_require__(3);
+	var _Worker = __webpack_require__(4);
 
 	var _Worker2 = _interopRequireDefault(_Worker);
 
-	var _riotObservable = __webpack_require__(5);
+	var _riotObservable = __webpack_require__(6);
 
 	var _riotObservable2 = _interopRequireDefault(_riotObservable);
 
+	var _Storage = __webpack_require__(7);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var _actionBuffer = Symbol();
 
 	var ModelAbstract = function () {
 	    _createClass(ModelAbstract, [{
@@ -262,12 +269,15 @@
 	    }]);
 
 	    function ModelAbstract() {
-	        var _this = this;
+	        var _modelData,
+	            _this = this;
 
 	        _classCallCheck(this, ModelAbstract);
 
 	        (0, _riotObservable2.default)(this);
+	        this[_actionBuffer] = new Set();
 	        this.modelData = this.constructor.DefaultData;
+	        if (this.modelData !== undefined) (_modelData = this.modelData).on.apply(_modelData, [ACTION_SIMPLE + ' ' + _Storage.ACTION_COMPLEX].concat(_toConsumableArray(function (args) {})));
 	        this.on('*', function (name, data) {
 	            var onTriggers = _this._onTriggerEventHandlers ? _this._onTriggerEventHandlers[name] : false;
 	            var promises = [];
@@ -324,7 +334,7 @@
 
 /***/ },
 
-/***/ 5:
+/***/ 6:
 /***/ function(module, exports, __webpack_require__) {
 
 	;(function(window, undefined) {var observable = function(el) {
@@ -495,7 +505,100 @@
 
 /***/ },
 
-/***/ 300:
+/***/ 7:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.UPDATE = exports.ACTION_COMPLEX = exports.ACTION_SIMPLE_DEL = exports.ACTION_SIMPLE_SET = undefined;
+	exports.Arr = Arr;
+	exports.Obj = Obj;
+	exports.Map = Map;
+	exports.Set = Set;
+
+	var _riotObservable = __webpack_require__(6);
+
+	var _riotObservable2 = _interopRequireDefault(_riotObservable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ACTION_SIMPLE_SET = exports.ACTION_SIMPLE_SET = 'action-simple-set';
+	var ACTION_SIMPLE_DEL = exports.ACTION_SIMPLE_DEL = 'action-simple-delete';
+	var ACTION_COMPLEX = exports.ACTION_COMPLEX = 'action-complex';
+	var UPDATE = exports.UPDATE = 'update';
+
+	var M = Map;
+	var S = Set;
+
+	function Arr() {
+		var input = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+
+		return Simple(input);
+	}
+
+	function Obj() {
+		var input = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+		return Simple(input);
+	}
+
+	function Map() {
+		var input = arguments.length <= 0 || arguments[0] === undefined ? new M() : arguments[0];
+
+		return Complex(input);
+	}
+
+	function Set() {
+		var input = arguments.length <= 0 || arguments[0] === undefined ? new S() : arguments[0];
+
+		return Complex(input);
+	}
+
+	function Simple(type) {
+		(0, _riotObservable2.default)(type);
+		type = new Proxy(type, {
+			set: function set(target, name, value) {
+				var r = target[name] = value;
+				// No need to trigger array length change
+				if (name === 'length') {
+					type.trigger(ACTION_SIMPLE_SET, name, value);
+					type.trigger(UPDATE);
+				}
+				return r;
+			},
+			deleteProperty: function deleteProperty(target, name, value) {
+				var r = target[name] = value;
+				type.trigger(ACTION_SIMPLE_DEL, name, value);
+				type.trigger(UPDATE);
+				return r;
+			}
+		});
+		return type;
+	}
+
+	function Complex(type) {
+		(0, _riotObservable2.default)(type)[('clear', 'delete', 'set')].forEach(function (method) {
+			var m = type['_' + method] = type[method];
+			type[method] = function () {
+				for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+					args[_key] = arguments[_key];
+				}
+
+				m.call(this, args);
+				type.trigger.apply(type, [ACTION_COMPLEX, method].concat(args));
+				type.trigger(method);
+				type.trigger(UPDATE);
+			};
+		});
+		return type;
+	}
+
+/***/ },
+
+/***/ 302:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -504,11 +607,11 @@
 
 	var _dec, _dec2, _dec3, _dec4, _desc, _value, _class;
 
-	var _Worker = __webpack_require__(3);
+	var _Worker = __webpack_require__(4);
 
 	var _Worker2 = _interopRequireDefault(_Worker);
 
-	var _Decorator = __webpack_require__(301);
+	var _Decorator = __webpack_require__(303);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -633,7 +736,7 @@
 
 /***/ },
 
-/***/ 301:
+/***/ 303:
 /***/ function(module, exports) {
 
 	'use strict';

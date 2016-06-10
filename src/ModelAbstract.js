@@ -1,6 +1,6 @@
 import Chambr from './Worker'
 import Observable from 'riot-observable'
-import { ACTION_SIMPLE, ACTION_COMPLEX} from './Storage'
+import { ACTION_SIMPLE_DEL, ACTION_SIMPLE_SET, ACTION_COMPLEX} from './Storage'
 
 const _actionBuffer = Symbol()
 
@@ -18,7 +18,7 @@ export default class ModelAbstract {
         Observable(this)
         this[_actionBuffer] = new Set()
         this.modelData = this.constructor.DefaultData
-        (this.modelData !== undefined) && this.modelData.on(`${ACTION_SIMPLE} ${ACTION_COMPLEX}`, ...args => {
+        if (this.modelData !== undefined) this.modelData.on(`${ACTION_SIMPLE} ${ACTION_COMPLEX}`, ...args => {
 
         })
         this.on('*', (name, data) => {

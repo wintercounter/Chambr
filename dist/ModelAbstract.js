@@ -15,9 +15,15 @@ var _riotObservable = require('riot-observable');
 
 var _riotObservable2 = _interopRequireDefault(_riotObservable);
 
+var _Storage = require('./Storage');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _actionBuffer = Symbol();
 
 var ModelAbstract = function () {
     _createClass(ModelAbstract, [{
@@ -31,12 +37,15 @@ var ModelAbstract = function () {
     }]);
 
     function ModelAbstract() {
-        var _this = this;
+        var _modelData,
+            _this = this;
 
         _classCallCheck(this, ModelAbstract);
 
         (0, _riotObservable2.default)(this);
+        this[_actionBuffer] = new Set();
         this.modelData = this.constructor.DefaultData;
+        if (this.modelData !== undefined) (_modelData = this.modelData).on.apply(_modelData, [ACTION_SIMPLE + ' ' + _Storage.ACTION_COMPLEX].concat(_toConsumableArray(function (args) {})));
         this.on('*', function (name, data) {
             var onTriggers = _this._onTriggerEventHandlers ? _this._onTriggerEventHandlers[name] : false;
             var promises = [];
