@@ -26,12 +26,12 @@ gulp.task('build', () => {
     return BabelTask('./src/**/*.js', './dist')
 })
 
-gulp.task('build-test-babel', () => {
-    return BabelTask('./test/*.es6', './test/')
+gulp.task('build-test-babel', ['build'], () => {
+    return BabelTask('./test/*.js', './test/dist/')
 })
 
-gulp.task('build-test', ['build', 'build-test-babel'], () => {
-    return gulp.src('./test/*.js')
+gulp.task('build-test', ['build-test-babel'], () => {
+    return gulp.src('./test/dist/*.js')
         .pipe(named())
         .pipe(webpack())
         .pipe(gulp.dest('./test/dist/'))

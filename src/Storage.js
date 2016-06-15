@@ -26,21 +26,22 @@ export function Set(input = new S()) {
 
 function Simple(type){
 	observable(type)
+	// TODO Compact callbacks
 	type = new Proxy(type, {
 		set: function(target, name, value){
 			let r = (target[name] = value)
 			// No need to trigger array length change
-			if (name === 'length') {
+			if (name !== 'length') {
 				type.trigger(ACTION_SIMPLE_SET, name, value)
 				type.trigger(UPDATE)
 			}
 			return r
 		},
 		deleteProperty: function(target, name, value){
-			let r = (target[name] = value)
+			delete target[name]
 			type.trigger(ACTION_SIMPLE_DEL, name, value)
 			type.trigger(UPDATE)
-			return r
+			return true
 		}
 	})
 	return type
@@ -48,7 +49,7 @@ function Simple(type){
 
 function Complex(type){
 	observable(type)
-		['clear', 'delete', 'set'].forEach(method => {
+	['clear', 'delete', 'set'].forEach(method => {
 		let m = type[`_${method}`] = type[method]
 		type[method] = function(...args){
 			m.call(this, args)

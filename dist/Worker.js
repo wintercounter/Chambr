@@ -23,10 +23,13 @@ var MODEL_INSTANCES = {};
 /** @type {Highway} */
 var HW = undefined;
 
+/**
+ * 
+ */
+
 var Chambr = function () {
 
     /**
-     *
      * @param HighwayInstance {Highway}
      */
 
@@ -35,7 +38,7 @@ var Chambr = function () {
 
         HW = HighwayInstance;
         HW.sub('ChambrWorker', function (ChambrEvent) {
-            console.log(JSON.stringify(ChambrEvent));
+            console.log('In-W: ', ChambrEvent);
             var ev = ChambrEvent.data;
             var route = ChambrEvent.name.split('->');
             var argList = Object.values(ev.argList);
@@ -43,19 +46,33 @@ var Chambr = function () {
             var model = Chambr.getModel(route[1], isConstructor ? argList : undefined);
             var method = model ? model[route[2]] : false;
             var responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient');
-            if (method) {
-                if (isConstructor) {
-                    return Chambr.Resolve(responseEventName, ev.requestId, model.modelData, {}, {});
-                }
+            if (method && isConstructor) {
+                Chambr.Resolve(responseEventName, ev.requestId, {
+                    buffer: Array.from(model.buffer),
+                    export: Chambr.Export(model)
+                });
+            } else if (method) {
                 var r = method.apply(model, argList);
                 try {
                     r.then(function (o) {
-                        return Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state);
+                        return Chambr.Resolve(responseEventName, ev.requestId, {
+                            buffer: Array.from(model.buffer),
+                            export: Chambr.Export(model),
+                            output: o
+                        });
                     }).catch(function (o) {
-                        return Chambr.Reject(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state);
+                        return Chambr.Reject(responseEventName, ev.requestId, {
+                            buffer: Array.from(model.buffer),
+                            export: Chambr.Export(model),
+                            output: o
+                        });
                     });
                 } catch (e) {
-                    Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), r, true);
+                    Chambr.Resolve(responseEventName, ev.requestId, {
+                        buffer: Array.from(model.buffer),
+                        export: Chambr.Export(model),
+                        output: r
+                    });
                 }
             }
         });
@@ -77,30 +94,24 @@ var Chambr = function () {
         }
     }, {
         key: 'Resolve',
-        value: function Resolve(eventName, responseId, modelData, modelExport, responseData, responseSoft) {
-            var responseState = arguments.length <= 6 || arguments[6] === undefined ? 'resolve' : arguments[6];
+        value: function Resolve(eventName, responseId, responseData) {
+            var responseState = arguments.length <= 3 || arguments[3] === undefined ? 'resolve' : arguments[3];
 
             HW.pub(eventName, {
                 responseId: responseId,
                 responseData: responseData,
-                responseSoft: responseSoft,
-                responseState: responseState,
-                modelData: modelData,
-                modelExport: modelExport
+                responseState: responseState
             }, 'resolve');
         }
     }, {
         key: 'Reject',
-        value: function Reject(eventName, responseId, modelData, modelExport, responseData, responseSoft) {
-            var responseState = arguments.length <= 6 || arguments[6] === undefined ? 'reject' : arguments[6];
+        value: function Reject(eventName, responseId, responseData) {
+            var responseState = arguments.length <= 3 || arguments[3] === undefined ? 'reject' : arguments[3];
 
             HW.pub(eventName, {
                 responseId: responseId,
                 responseData: responseData,
-                responseSoft: responseSoft,
-                responseState: responseState,
-                modelData: modelData,
-                modelExport: modelExport
+                responseState: responseState
             }, 'reject');
         }
     }, {

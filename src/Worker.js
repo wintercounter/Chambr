@@ -6,16 +6,18 @@ const MODEL_INSTANCES = {}
 /** @type {Highway} */
 var HW = undefined
 
+/**
+ * 
+ */
 export default class Chambr {
 
     /**
-     *
      * @param HighwayInstance {Highway}
      */
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('ChambrWorker', function(ChambrEvent){
-            console.log(JSON.stringify(ChambrEvent))
+            console.log('In-W: ', ChambrEvent)
             let ev      = ChambrEvent.data
             let route   = ChambrEvent.name.split('->')
             let argList = Object.values(ev.argList)
@@ -23,17 +25,32 @@ export default class Chambr {
             let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
             let method  = model ? model[route[2]] : false
             let responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient')
-            if (method) {
-                if (isConstructor) {
-                    return Chambr.Resolve(responseEventName, ev.requestId, model.modelData, {}, {})
-                }
+            if (method && isConstructor) {
+                Chambr.Resolve(responseEventName, ev.requestId, {
+                    buffer: Array.from(model.buffer),
+                    export: Chambr.Export(model)
+                })
+            }
+            else if (method) {
                 let r = method.apply(model, argList)
                 try {
-                    r.then(o => Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
-                     .catch(o => Chambr.Reject(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), o.data, o.soft, o.state))
+                    r.then(o => Chambr.Resolve(responseEventName, ev.requestId, {
+                            buffer: Array.from(model.buffer),
+                            export: Chambr.Export(model),
+                            output: o
+                        }))
+                     .catch(o => Chambr.Reject(responseEventName, ev.requestId, {
+                         buffer: Array.from(model.buffer),
+                         export: Chambr.Export(model),
+                         output: o
+                     }))
                 }
                 catch(e){
-                    Chambr.Resolve(responseEventName, ev.requestId, model.modelData, Chambr.Export(model), r, true)
+                    Chambr.Resolve(responseEventName, ev.requestId, {
+                        buffer: Array.from(model.buffer),
+                        export: Chambr.Export(model),
+                        output: r
+                    })
                 }
             }
         })
@@ -101,25 +118,19 @@ export default class Chambr {
         return model
     }
 
-    static Resolve(eventName, responseId, modelData, modelExport, responseData, responseSoft, responseState = 'resolve'){
+    static Resolve(eventName, responseId, responseData, responseState = 'resolve'){
         HW.pub(eventName, {
             responseId,
             responseData,
-            responseSoft,
-            responseState,
-            modelData,
-            modelExport
+            responseState
         }, 'resolve')
     }
 
-    static Reject(eventName, responseId, modelData, modelExport, responseData, responseSoft, responseState = 'reject') {
+    static Reject(eventName, responseId, responseData, responseState = 'reject') {
         HW.pub(eventName, {
             responseId,
             responseData,
-            responseSoft,
-            responseState,
-            modelData,
-            modelExport
+            responseState
         }, 'reject')
     }
 

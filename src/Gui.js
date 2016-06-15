@@ -21,35 +21,39 @@ export default class Chambr {
     constructor(HighwayInstance){
         HW = HighwayInstance
         HW.sub('ChambrClient->Expose', exposeEvent => {
-            console.log(JSON.stringify(exposeEvent))
+            console.log('In-Exp: ', exposeEvent)
             let exposeData = exposeEvent.data
             let model = this.$[exposeData.modelName] = this.applyApi(exposeData)
 
             HW.sub(`ChambrClient->${exposeData.modelName}`, modelEvent => {
-                console.log(JSON.stringify(modelEvent))
+                console.log('In-GUI: ', modelEvent)
                 let d             = modelEvent.data
                 let responseState = d.responseState
                 let responseId    = d.responseId
-                let responseData  = d.responseData
-                let responseSoft  = d.responseSoft
-                let modelData     = d.modelData
-                let modelExport   = d.modelExport
+                let responseData  = d.responseData || {}
+                let modelExport   = responseData.export
+                let modelBuffer   = responseData.buffer || []
+                let modelOutput   = responseData.output
 
-                if (typeof modelData === 'object') {
-                    for (let k in model)
-                        if (model.hasOwnProperty(k))
-                            delete model[k]
+                // Update data
+                modelBuffer.forEach(action => {
+                    let act = action[0]
+                    let idx = action[1]
+                    let val = action[2]
 
-                    Object.assign(model, modelData)
-                }
+                    switch (act) {
+                        case 'action-simple-set':
+                            model[idx] = val
+                            break;
+                        case 'action-simple-delete':
+                            delete model[idx]
+                            break;
+                    }
+                })
 
                 if (responseState && responseId) {
                     let methods = this._promises[responseId]
-                    methods && methods[modelEvent.state].call(null,
-                        responseData !== undefined
-                            ? responseData
-                            : modelData
-                    )
+                    methods && methods[modelEvent.state].call(null, modelOutput)
                     delete this._promises[responseId]
                 }
 
@@ -60,8 +64,7 @@ export default class Chambr {
 
                 model.trigger(modelEvent.name, modelEvent.data)
                 model.trigger(modelEvent.state, modelEvent.data)
-                model.trigger(responseSoft ? 'soft' : 'hard', d)
-                !responseSoft && model.trigger('updated', d)
+                modelBuffer.length && model.trigger('update', d)
                 responseState && model.trigger(responseState, d)
             })
         })
@@ -111,6 +114,7 @@ export default class Chambr {
                     value = descriptor
                     break;
                 case 'peel':
+                    var _typeof = _typeof
                     let peelList = descriptor.list
                     eval(`value = ${descriptor.fn}`)
                     break;

@@ -1,11 +1,10 @@
-'use strict';
+import 'babel-polyfill'
+import './InitChambrWorker'
+import './Test.Model.Array'
+import './Test.Model.Object'
+//import './Test.Model.Map'
+//import './Test.Model.Set'
 
-require('babel-polyfill');
+console.info('Worker engine started.')
 
-require('./InitChambrWorker');
-
-require('./Test.Model');
-
-console.info('Worker engine started.');
-
-self.HW.pub('Worker->Ready');
+self.HW.pub('Worker->Ready')

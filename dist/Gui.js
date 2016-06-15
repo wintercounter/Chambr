@@ -7,8 +7,6 @@ exports.default = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _riotObservable = require('riot-observable');
@@ -45,29 +43,39 @@ var Chambr = function () {
 
         HW = HighwayInstance;
         HW.sub('ChambrClient->Expose', function (exposeEvent) {
-            console.log(JSON.stringify(exposeEvent));
+            console.log('In-Exp: ', exposeEvent);
             var exposeData = exposeEvent.data;
             var model = _this.$[exposeData.modelName] = _this.applyApi(exposeData);
 
             HW.sub('ChambrClient->' + exposeData.modelName, function (modelEvent) {
-                console.log(JSON.stringify(modelEvent));
+                console.log('In-GUI: ', modelEvent);
                 var d = modelEvent.data;
                 var responseState = d.responseState;
                 var responseId = d.responseId;
-                var responseData = d.responseData;
-                var responseSoft = d.responseSoft;
-                var modelData = d.modelData;
-                var modelExport = d.modelExport;
+                var responseData = d.responseData || {};
+                var modelExport = responseData.export;
+                var modelBuffer = responseData.buffer || [];
+                var modelOutput = responseData.output;
 
-                if ((typeof modelData === 'undefined' ? 'undefined' : _typeof(modelData)) === 'object') {
-                    for (var k in model) {
-                        if (model.hasOwnProperty(k)) delete model[k];
-                    }_extends(model, modelData);
-                }
+                // Update data
+                modelBuffer.forEach(function (action) {
+                    var act = action[0];
+                    var idx = action[1];
+                    var val = action[2];
+
+                    switch (act) {
+                        case 'action-simple-set':
+                            model[idx] = val;
+                            break;
+                        case 'action-simple-delete':
+                            delete model[idx];
+                            break;
+                    }
+                });
 
                 if (responseState && responseId) {
                     var methods = _this._promises[responseId];
-                    methods && methods[modelEvent.state].call(null, responseData !== undefined ? responseData : modelData);
+                    methods && methods[modelEvent.state].call(null, modelOutput);
                     delete _this._promises[responseId];
                 }
 
@@ -78,8 +86,7 @@ var Chambr = function () {
 
                 model.trigger(modelEvent.name, modelEvent.data);
                 model.trigger(modelEvent.state, modelEvent.data);
-                model.trigger(responseSoft ? 'soft' : 'hard', d);
-                !responseSoft && model.trigger('updated', d);
+                modelBuffer.length && model.trigger('update', d);
                 responseState && model.trigger(responseState, d);
             });
         });
@@ -140,6 +147,8 @@ var Chambr = function () {
                         value = descriptor;
                         break;
                     case 'peel':
+                        _typeof = _typeof;
+
                         var peelList = descriptor.list;
                         eval('value = ' + descriptor.fn);
                         break;
@@ -154,6 +163,8 @@ var Chambr = function () {
             };
 
             for (var decorator in apiData.decorators) {
+                var _typeof;
+
                 var _ret = _loop(decorator);
 
                 if (_ret === 'continue') continue;

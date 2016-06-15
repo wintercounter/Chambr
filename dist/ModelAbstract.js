@@ -19,80 +19,76 @@ var _Storage = require('./Storage');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+// Privates
 var _actionBuffer = Symbol();
+var _bufferTimeout = Symbol();
+var _initBuffer = Symbol();
+var _broadcast = Symbol();
+var _broadcastUpdate = Symbol();
 
 var ModelAbstract = function () {
-    _createClass(ModelAbstract, [{
-        key: 'modelData',
-        set: function set(o) {
-            this._data = o;
-        },
-        get: function get() {
-            return this._data;
-        }
-    }]);
-
     function ModelAbstract() {
-        var _modelData,
-            _this = this;
+        var _this = this;
+
+        var data = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
         _classCallCheck(this, ModelAbstract);
 
+        this.data = undefined;
+
+        this.data = data;
         (0, _riotObservable2.default)(this);
-        this[_actionBuffer] = new Set();
-        this.modelData = this.constructor.DefaultData;
-        if (this.modelData !== undefined) (_modelData = this.modelData).on.apply(_modelData, [ACTION_SIMPLE + ' ' + _Storage.ACTION_COMPLEX].concat(_toConsumableArray(function (args) {})));
+        this[_initBuffer]();
         this.on('*', function (name, data) {
             var onTriggers = _this._onTriggerEventHandlers ? _this._onTriggerEventHandlers[name] : false;
             var promises = [];
             onTriggers && onTriggers.forEach(function (method) {
                 var p = _this[method].call(_this, name, data);
-                p.then && promises.push(p);
+                p && p.then && promises.push(p);
             });
 
             if (promises.length) {
                 Promise.all(promises).then(function () {
-                    return _this.broadcast(name, data, false);
+                    return _this[_broadcast](name, data);
                 });
             } else {
-                _this.broadcast(name, data);
+                _this[_broadcast](name, data);
             }
         });
     }
 
-    // TODO to private
-
-
     _createClass(ModelAbstract, [{
-        key: 'broadcast',
-        value: function broadcast(name) {
+        key: _broadcast,
+        value: function value(name) {
             var data = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
-            var soft = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
 
-            _Worker2.default.Resolve('ChambrClient->' + this.constructor.name + '->Event', -1, this.modelData, _Worker2.default.Export(this), data, soft, name);
+            _Worker2.default.Resolve('ChambrClient->' + this.constructor.name + '->Event', -1, data, name);
         }
     }, {
-        key: 'resolve',
-        value: function resolve() {
-            var data = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
-            var soft = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-            var state = arguments.length <= 2 || arguments[2] === undefined ? 'resolve' : arguments[2];
+        key: _initBuffer,
+        value: function value() {
+            var _this2 = this;
 
-            return Promise.resolve({ data: data, soft: soft, state: state });
+            this.buffer = new Set();
+            if (this.data !== undefined && this.data.on) {
+                this.data.on(_Storage.ACTION_SIMPLE_DEL + ' ' + _Storage.ACTION_SIMPLE_SET + ' ' + _Storage.ACTION_COMPLEX, function () {
+                    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                        args[_key] = arguments[_key];
+                    }
+
+                    clearTimeout(_this2[_bufferTimeout]);
+                    _this2.buffer.add(args);
+                    _this2[_bufferTimeout] = setTimeout(function () {
+                        return _this2.buffer.clear();
+                    }, 0);
+                });
+            }
         }
     }, {
-        key: 'reject',
-        value: function reject() {
-            var data = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
-            var soft = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-            var state = arguments.length <= 2 || arguments[2] === undefined ? 'reject' : arguments[2];
-
-            return Promise.reject({ data: data, soft: soft, state: state });
-        }
+        key: _broadcastUpdate,
+        value: function value() {}
     }]);
 
     return ModelAbstract;
