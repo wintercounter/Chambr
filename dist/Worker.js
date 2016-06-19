@@ -178,5 +178,8 @@ exports.default = Chambr;
 
 
 function extractFunctionName(fn) {
-    return fn.toString().match(/function\W+([\w$_]+?)\(/)[1];
+    var match = void 0;
+    fn = fn.toString();
+    match = fn.match(/class\W+(.*?)\W+/);
+    if (match) return match[1];else return fn.match(/function\W+([\w$_]+?)\(/)[1];
 }
