@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 exports.Default = Default;
 exports.Trigger = Trigger;
 exports.On = On;
@@ -26,7 +24,7 @@ function Default(v) {
 }
 
 function Trigger() {
-    var ev = arguments.length <= 0 || arguments[0] === undefined ? 'updated' : arguments[0];
+    var ev = arguments.length <= 0 || arguments[0] === undefined ? 'update' : arguments[0];
 
     return function (target, name, descriptor) {
         var old = descriptor.value;
@@ -78,8 +76,8 @@ function Peel() {
                     peelArgIndex = parseInt(tmp[0], 10);
                     peel = tmp[1];
                 }
-                if (_typeof(args[peelArgIndex]) === 'object') {
-                    try {
+                try {
+                    if (args[peelArgIndex]) {
                         (function () {
                             var r = args[peelArgIndex];
                             var str = peel.split('->');
@@ -89,8 +87,8 @@ function Peel() {
                             if (r === undefined) throw 'e';
                             finalArgs[i] = r;
                         })();
-                    } catch (e) {}
-                }
+                    }
+                } catch (e) {}
             });
             finalArgs.forEach(function (v, i) {
                 return args[i] = v;

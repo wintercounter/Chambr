@@ -4,11 +4,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _dec, _dec2, _dec3, _dec4, _desc, _value, _class;
 
-var _Worker = require('../dist/Worker');
+var _Worker = require('../../dist/Worker');
 
 var _Worker2 = _interopRequireDefault(_Worker);
 
-var _Decorator = require('../dist/Decorator');
+var _Decorator = require('../../dist/Decorator');
+
+var _Storage = require('../../dist/Storage');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -47,51 +49,52 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 	return desc;
 }
 
-//import LocalStorage from '../dist/Adapter/LocalStorage'
+//import LocalStorage from '../../dist/Adapter/LocalStorage'
 
 /**
  * @extends ModelAbstract
  */
-var Test = (_dec = (0, _Decorator.Default)(-1), _dec2 = (0, _Decorator.Peel)('item->value'), _dec3 = (0, _Decorator.Trigger)('customEvent'), _dec4 = (0, _Decorator.On)('remoteUpdated'), (_class = function (_Chambr$Model) {
-	_inherits(Test, _Chambr$Model);
+var TestArray = (_dec = (0, _Decorator.Default)(-1), _dec2 = (0, _Decorator.Peel)('item->value'), _dec3 = (0, _Decorator.Trigger)('customEvent'), _dec4 = (0, _Decorator.On)('remoteUpdated'), (_class = function (_Chambr$Model) {
+	_inherits(TestArray, _Chambr$Model);
 
-	_createClass(Test, [{
+	_createClass(TestArray, [{
 		key: 'total',
 		get: function get() {
-			return this.modelData.length;
+			return this.data.length;
 		}
 	}]);
 
-	function Test() {
-		_classCallCheck(this, Test);
+	function TestArray() {
+		var _this$data;
 
-		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Test).call(this));
+		_classCallCheck(this, TestArray);
 
-		_this.modelData = ['one', 'two'];
+		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TestArray).call(this, new _Storage.Arr()));
+
+		var data = ['one', 'two'];
+		(_this$data = _this.data).push.apply(_this$data, data);
 		return _this;
 	}
 
-	_createClass(Test, [{
+	_createClass(TestArray, [{
 		key: 'create',
 		value: function create(value) {
-			this.modelData.push(value);
-			return this.resolve(this.modelData.length - 1);
+			this.data.push(value);
 		}
 	}, {
 		key: 'read',
 		value: function read(index) {
-			return this.modelData[index];
+			return this.data[index];
 		}
 	}, {
 		key: 'update',
 		value: function update(index, value) {
-			this.modelData[index] = value;
-			return this.resolve(value);
+			this.data[index] = value;
 		}
 	}, {
 		key: 'delete',
 		value: function _delete(index) {
-			return this.resolve(this.modelData.splice(index, 1));
+			this.data.splice(index, 1);
 		}
 	}, {
 		key: 'triggerOnTest',
@@ -100,33 +103,31 @@ var Test = (_dec = (0, _Decorator.Default)(-1), _dec2 = (0, _Decorator.Peel)('it
 		}
 	}, {
 		key: 'onRemoteUpdated',
-		value: function onRemoteUpdated() {
-			return this.resolve();
-		}
+		value: function onRemoteUpdated() {}
 	}, {
 		key: '_calcPrivate',
 		value: function _calcPrivate() {}
 	}]);
 
-	return Test;
+	return TestArray;
 }(_Worker2.default.Model), (_applyDecoratedDescriptor(_class.prototype, 'total', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'total'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'create', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, 'create'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'delete', [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, 'delete'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onRemoteUpdated', [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, 'onRemoteUpdated'), _class.prototype)), _class));
 
-var TestExtended = function (_Test) {
-	_inherits(TestExtended, _Test);
+var TestExtendedArray = function (_TestArray) {
+	_inherits(TestExtendedArray, _TestArray);
 
-	function TestExtended() {
-		_classCallCheck(this, TestExtended);
+	function TestExtendedArray() {
+		_classCallCheck(this, TestExtendedArray);
 
-		return _possibleConstructorReturn(this, Object.getPrototypeOf(TestExtended).apply(this, arguments));
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(TestExtendedArray).apply(this, arguments));
 	}
 
-	_createClass(TestExtended, [{
+	_createClass(TestExtendedArray, [{
 		key: 'extended',
 		value: function extended() {}
 	}]);
 
-	return TestExtended;
-}(Test);
+	return TestExtendedArray;
+}(TestArray);
 
-_Worker2.default.Model = Test;
-_Worker2.default.Model = TestExtended;
+_Worker2.default.Model = TestArray;
+_Worker2.default.Model = TestExtendedArray;

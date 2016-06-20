@@ -9,7 +9,7 @@ export function Default(v){
     }
 }
 
-export function Trigger(ev = 'updated'){
+export function Trigger(ev = 'update'){
     return function(target, name, descriptor){
         var old = descriptor.value
         descriptor.value = function(...args){
@@ -45,16 +45,16 @@ export function Peel(...peelList){
                     peelArgIndex = parseInt(tmp[0], 10)
                     peel = tmp[1]
                 }
-                if (typeof args[peelArgIndex] === 'object') {
-                    try {
+                try {
+                    if (args[peelArgIndex]) {
                         let r = args[peelArgIndex]
                         let str = peel.split('->')
                         str.forEach(x => r = r[x])
                         if (r === undefined) throw 'e'
                         finalArgs[i] = r
                     }
-                    catch(e){}
                 }
+                catch(e){}
             })
             finalArgs.forEach((v, i) => args[i] = v)
             return old.call(this, ...args)
