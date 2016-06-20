@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+	<title>Socket.IO chat</title>
+	<style>
+		html, body {
+			margin:0;
+			padding:0;
+		}
+
+		img {
+			margin:auto;
+			padding:0;
+			position: absolute;
+			display: block;
+			top: 0;
+			left: -15vw;
+			right: 0;
+			bottom: 0;
+			min-width: 130vw;
+			animation: 3s anim linear;
+			transform: rotate(0deg) scale(0);
+		}
+
+		@keyframes anim {
+			0% {
+				transform: rotate(0deg) scale(1) translate(0, 0);
+			}
+			85% {
+				transform: rotate(-120deg) scale(1) translate(0, 0);
+			}
+			100% {
+				transform: rotate(-360deg) scale(0) translate(100vw, 100vh);
+			}
+		}
+	</style>
+</head>
+<body>
+	<img src="./bg.svg">
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io();
+	</script>
+</body>
+</html>
