@@ -5,7 +5,7 @@ import { Obj } from '../../dist/Storage'
 /**
  * @extends ModelAbstract
  */
-class TestObject extends Chambr.Model {
+class TestObject extends Chambr.Instance.Model {
 
 	@Default(-1)
 	get total(){
@@ -53,5 +53,5 @@ class TestExtendedObject extends TestObject {
 	extended(){}
 }
 
-Chambr.Model = TestObject
-Chambr.Model = TestExtendedObject
+Chambr.Instance.Model = TestObject
+Chambr.Instance.Model = TestExtendedObject

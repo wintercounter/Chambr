@@ -1,54 +1,60 @@
 import ModelAbstract from './ModelAbstract'
 
-const MODEL_LIBRARY = {}
-const MODEL_INSTANCES = {}
-
-/** @type {Highway} */
-var HW = undefined
+let lastInstance = undefined
 
 /**
  * 
  */
 export default class Chambr {
 
+    MODEL_LIBRARY = {}
+    MODEL_INSTANCES = {}
+    HW = undefined
+    INSTANCE = undefined
+
+    static get Instance(){
+        return lastInstance
+    }
+
     /**
      * @param HighwayInstance {Highway}
      */
     constructor(HighwayInstance){
-        HW = HighwayInstance
-        HW.sub('ChambrWorker', function(ChambrEvent){
+        this.INSTANCE = lastInstance = this
+        this.HW = HighwayInstance
+        this.HW.sub('ChambrWorker', ChambrEvent => {
             console.log('In-W: ', ChambrEvent)
             let ev      = ChambrEvent.data
             let route   = ChambrEvent.name.split('->')
             let argList = Object.values(ev.argList)
             let isConstructor = route[2] === 'constructor'
-            let model   = Chambr.getModel(route[1], isConstructor ? argList : undefined)
+            let model   = this.getModel(route[1], isConstructor ? argList : undefined)
             let method  = model ? model[route[2]] : false
             let responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient')
             if (method && isConstructor) {
-                Chambr.Resolve(responseEventName, ev.requestId, {
+                this.resolve(responseEventName, ev.requestId, {
                     buffer: Array.from(model.buffer),
-                    export: Chambr.Export(model)
+                    export: this.exports(model)
                 })
             }
             else if (method) {
                 let r = method.apply(model, argList)
                 try {
-                    r.then(o => Chambr.Resolve(responseEventName, ev.requestId, {
+                    r.then(o => this.resolve(responseEventName, ev.requestId, {
                             buffer: Array.from(model.buffer),
-                            export: Chambr.Export(model),
+                            export: this.exports(model),
                             output: o
                         }))
-                     .catch(o => Chambr.Reject(responseEventName, ev.requestId, {
+                     .catch(o => this.reject(responseEventName, ev.requestId, {
                          buffer: Array.from(model.buffer),
-                         export: Chambr.Export(model),
+                         export: this.exports(model),
                          output: o
                      }))
                 }
                 catch(e){
-                    Chambr.Resolve(responseEventName, ev.requestId, {
+                    this.resolve(responseEventName, ev.requestId, {
                         buffer: Array.from(model.buffer),
-                        export: Chambr.Export(model),
+                        export: this.exports(model),
                         output: r
                     })
                 }
@@ -57,18 +63,19 @@ export default class Chambr {
     }
 
     /** @returns {ModelAbstract} */
-    static get Model(){
+    get Model(){
+        ModelAbstract.Chambr = this
         return ModelAbstract
     }
 
     /**
      * @param model {ModelAbstract}
      */
-    static set Model(model) {
+    set Model(model) {
         let api = []
         let tmpModel = model.prototype
         let modelName = extractFunctionName(model)
-        MODEL_LIBRARY[modelName] = model
+        this.MODEL_LIBRARY[modelName] = model
 
         do {
             Object.getOwnPropertyNames(tmpModel)
@@ -103,38 +110,38 @@ export default class Chambr {
 
         model.prototype._exposedApi = api
 
-        HW.pub('ChambrClient->Expose', {
+        this.HW.pub('ChambrClient->Expose', {
             modelData: model.DefaultData,
             modelName: modelName,
             modelApi: api
         })
     }
 
-    static getModel(modelName, argList = []){
-        let model = MODEL_INSTANCES[modelName]
+    getModel(modelName, argList = []){
+        let model = this.MODEL_INSTANCES[modelName]
         if (!model) {
-            model = MODEL_INSTANCES[modelName] = new MODEL_LIBRARY[modelName](...argList)
+            model = this.MODEL_INSTANCES[modelName] = new this.MODEL_LIBRARY[modelName](...argList)
         }
         return model
     }
 
-    static Resolve(eventName, responseId, responseData, responseState = 'resolve'){
-        HW.pub(eventName, {
+    resolve(eventName, responseId, responseData, responseState = 'resolve'){
+        this.HW.pub(eventName, {
             responseId,
             responseData,
             responseState
         }, 'resolve')
     }
 
-    static Reject(eventName, responseId, responseData, responseState = 'reject') {
-        HW.pub(eventName, {
+    reject(eventName, responseId, responseData, responseState = 'reject') {
+        this.HW.pub(eventName, {
             responseId,
             responseData,
             responseState
         }, 'reject')
     }
 
-    static Export(model){
+    exports(model){
         let results = {}
         model._exposedApi.forEach(apiData => {
             apiData.type === 'var' && (results[apiData.name] = model[apiData.name])

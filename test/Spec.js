@@ -116,6 +116,7 @@ function getSuite(suiteType){
 
 		test('extended model', function(done){
 			assert.isOk($.hasOwnProperty('TestExtended' + suiteType))
+			TestExt()
 			assert.isFunction(TestExt.create)
 			assert.isFunction(TestExt.read)
 			assert.isFunction(TestExt.update)

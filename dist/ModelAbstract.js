@@ -7,10 +7,6 @@ exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Worker = require('./Worker');
-
-var _Worker2 = _interopRequireDefault(_Worker);
-
 var _riotObservable = require('riot-observable');
 
 var _riotObservable2 = _interopRequireDefault(_riotObservable);
@@ -22,11 +18,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Privates
-var _actionBuffer = Symbol();
 var _bufferTimeout = Symbol();
 var _initBuffer = Symbol();
 var _broadcast = Symbol();
-var _broadcastUpdate = Symbol();
 
 var ModelAbstract = function () {
     function ModelAbstract() {
@@ -38,8 +32,8 @@ var ModelAbstract = function () {
 
         this.data = undefined;
 
-        this.data = data;
         (0, _riotObservable2.default)(this);
+        this.data = data;
         this[_initBuffer]();
         this.on('*', function (name, data) {
             var onTriggers = _this._onTriggerEventHandlers ? _this._onTriggerEventHandlers[name] : false;
@@ -64,7 +58,12 @@ var ModelAbstract = function () {
         value: function value(name) {
             var data = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
 
-            _Worker2.default.Resolve('ChambrClient->' + this.constructor.name + '->Event', -1, data, name);
+            var Chambr = this.constructor.__proto__;
+            while (Chambr.name !== 'ModelAbstract') {
+                Chambr = Chambr.__proto__;
+            }
+            Chambr = Chambr.Chambr;
+            Chambr.resolve('ChambrClient->' + this.constructor.name + '->Event', -1, data, name);
         }
     }, {
         key: _initBuffer,
@@ -86,9 +85,6 @@ var ModelAbstract = function () {
                 });
             }
         }
-    }, {
-        key: _broadcastUpdate,
-        value: function value() {}
     }]);
 
     return ModelAbstract;

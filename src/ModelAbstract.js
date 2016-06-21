@@ -1,21 +1,18 @@
-import Chambr from './Worker'
 import Observable from 'riot-observable'
 import { ACTION_SIMPLE_DEL, ACTION_SIMPLE_SET, ACTION_COMPLEX} from './Storage'
 
 // Privates
-const _actionBuffer    = Symbol()
 const _bufferTimeout   = Symbol()
 const _initBuffer      = Symbol()
 const _broadcast       = Symbol()
-const _broadcastUpdate = Symbol()
 
 export default class ModelAbstract {
     
     data = undefined
 
     constructor(data = []){
-        this.data = data
         Observable(this)
+        this.data   = data
         this[_initBuffer]()
         this.on('*', (name, data) => {
             let onTriggers = this._onTriggerEventHandlers ? this._onTriggerEventHandlers[name] : false
@@ -35,7 +32,12 @@ export default class ModelAbstract {
     }
 
     [_broadcast](name, data = undefined){
-        Chambr.Resolve(`ChambrClient->${this.constructor.name}->Event`, -1, data, name)
+        let Chambr = this.constructor.__proto__
+        while(Chambr.name !== 'ModelAbstract') {
+            Chambr = Chambr.__proto__
+        }
+        Chambr = Chambr.Chambr
+        Chambr.resolve(`ChambrClient->${this.constructor.name}->Event`, -1, data, name)
     }
 
     [_initBuffer](){
@@ -48,9 +50,4 @@ export default class ModelAbstract {
             })
         }
     }
-
-    [_broadcastUpdate](){
-
-    }
-
 }

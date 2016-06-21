@@ -1,12 +1,11 @@
 import Chambr from '../../dist/Worker'
 import { Trigger, Default, On, Peel } from '../../dist/Decorator'
 import { Arr } from '../../dist/Storage'
-//import LocalStorage from '../../dist/Adapter/LocalStorage'
 
 /**
  * @extends ModelAbstract
  */
-class TestArray extends Chambr.Model {
+class TestArray extends Chambr.Instance.Model {
 
 	@Default(-1)
 	get total(){
@@ -55,5 +54,5 @@ class TestExtendedArray extends TestArray {
 	extended(){}
 }
 
-Chambr.Model = TestArray
-Chambr.Model = TestExtendedArray
+Chambr.Instance.Model = TestArray
+Chambr.Instance.Model = TestExtendedArray
