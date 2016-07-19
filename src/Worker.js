@@ -1,4 +1,4 @@
-import ModelAbstract from './ModelAbstract'
+import { ModelAbstract, _buffer } from './ModelAbstract'
 
 let lastInstance = undefined
 
@@ -33,7 +33,7 @@ export default class Chambr {
             let responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient')
             if (method && isConstructor) {
                 this.resolve(responseEventName, ev.requestId, {
-                    buffer: Array.from(model.buffer),
+                    buffer: Array.from(model[_buffer]),
                     export: this.exports(model)
                 })
             }
@@ -41,19 +41,19 @@ export default class Chambr {
                 let r = method.apply(model, argList)
                 try {
                     r.then(o => this.resolve(responseEventName, ev.requestId, {
-                            buffer: Array.from(model.buffer),
+                            buffer: Array.from(model[_buffer]),
                             export: this.exports(model),
                             output: o
                         }))
                      .catch(o => this.reject(responseEventName, ev.requestId, {
-                         buffer: Array.from(model.buffer),
+                         buffer: Array.from(model[_buffer]),
                          export: this.exports(model),
                          output: o
                      }))
                 }
                 catch(e){
                     this.resolve(responseEventName, ev.requestId, {
-                        buffer: Array.from(model.buffer),
+                        buffer: Array.from(model[_buffer]),
                         export: this.exports(model),
                         output: r
                     })

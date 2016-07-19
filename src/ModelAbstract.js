@@ -2,19 +2,42 @@ import Observable from 'riot-observable'
 import { ACTION_SIMPLE_DEL, ACTION_SIMPLE_SET, ACTION_COMPLEX} from './Storage'
 
 // Privates
+export const _buffer   = Symbol()
 const _bufferTimeout   = Symbol()
 const _initBuffer      = Symbol()
 const _broadcast       = Symbol()
 
+/**
+ * Abstract class for Models
+ */
 export default class ModelAbstract {
-    
+
+    /**
+     * The model data itself.
+     * @type {*}
+     */
     data = undefined
 
+    /**
+     *
+     * @param {*} data Default model data
+     * @constructor
+     */
     constructor(data = []){
+
+        // Make it observable
         Observable(this)
-        this.data   = data
+
+        // Save
+        this.data = data
+
+        // Initialize action buffer
         this[_initBuffer]()
+
+        // Subscribe to every model event
         this.on('*', (name, data) => {
+
+            // Handle @Trigger decorator
             let onTriggers = this._onTriggerEventHandlers ? this._onTriggerEventHandlers[name] : false
             let promises = []
             onTriggers && onTriggers.forEach(method => {
@@ -31,6 +54,13 @@ export default class ModelAbstract {
         })
     }
 
+    /**
+     * Triggers/broadcasts events to GUI
+     *
+     * @param name
+     * @param data
+     * @private
+     */
     [_broadcast](name, data = undefined){
         let Chambr = this.constructor.__proto__
         while(Chambr.name !== 'ModelAbstract') {
@@ -40,13 +70,20 @@ export default class ModelAbstract {
         Chambr.resolve(`ChambrClient->${this.constructor.name}->Event`, -1, data, name)
     }
 
+    /**
+     * Initializes action buffer
+     * We will collect different actions
+     * to not execute them one-by-one.
+     *
+     * @private
+     */
     [_initBuffer](){
-        this.buffer = new Set()
+        let buffer = this[_buffer] = new Set()
         if (this.data !== undefined && this.data.on) {
             this.data.on(`${ACTION_SIMPLE_DEL} ${ACTION_SIMPLE_SET} ${ACTION_COMPLEX}`, (...args) => {
                 clearTimeout(this[_bufferTimeout])
-                this.buffer.add(args)
-                this[_bufferTimeout] = setTimeout(() => this.buffer.clear(), 0)
+                buffer.add(args)
+                this[_bufferTimeout] = setTimeout(buffer.clear, 0)
             })
         }
     }
