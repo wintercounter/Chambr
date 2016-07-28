@@ -63,7 +63,7 @@ export default class ModelAbstract {
      */
     [_broadcast](name, data = undefined){
         let Chambr = this.constructor.__proto__
-        while(Chambr.name !== 'ModelAbstract') {
+        while (Chambr.name !== 'ModelAbstract') {
             Chambr = Chambr.__proto__
         }
         Chambr = Chambr.Chambr
