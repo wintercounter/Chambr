@@ -26,7 +26,7 @@ var EV = exports.EV = {
 
 var STATE = exports.STATE = {
 	CALM: 'state-calm',
-	LOADING: 'state-calm'
+	LOADING: 'state-loading'
 };
 
 var DEFAULTS = exports.DEFAULTS = {

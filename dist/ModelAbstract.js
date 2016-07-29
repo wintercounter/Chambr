@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
+exports.default = exports._buffer = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -18,24 +18,44 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Privates
+var _buffer = exports._buffer = Symbol();
 var _bufferTimeout = Symbol();
 var _initBuffer = Symbol();
 var _broadcast = Symbol();
 
-var ModelAbstract = function () {
-    function ModelAbstract() {
-        var _this = this;
+/**
+ * Abstract class for Models
+ */
 
-        var data = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+var ModelAbstract = function () {
+
+    /**
+     *
+     * @param {*} data Default model data
+     * @constructor
+     */
+
+    function ModelAbstract(data) {
+        var _this = this;
 
         _classCallCheck(this, ModelAbstract);
 
         this.data = undefined;
 
+
+        // Make it observable
         (0, _riotObservable2.default)(this);
-        this.data = data;
+
+        // Save
+        this.data = data || this.__proto__.DefaultData || [];
+
+        // Initialize action buffer
         this[_initBuffer]();
+
+        // Subscribe to every model event
         this.on('*', function (name, data) {
+
+            // Handle @Trigger decorator
             var onTriggers = _this._onTriggerEventHandlers ? _this._onTriggerEventHandlers[name] : false;
             var promises = [];
             onTriggers && onTriggers.forEach(function (method) {
@@ -53,6 +73,21 @@ var ModelAbstract = function () {
         });
     }
 
+    /**
+     * Triggers/broadcasts events to GUI
+     *
+     * @param name
+     * @param data
+     * @private
+     */
+
+
+    /**
+     * The model data itself.
+     * @type {*}
+     */
+
+
     _createClass(ModelAbstract, [{
         key: _broadcast,
         value: function value(name) {
@@ -65,12 +100,21 @@ var ModelAbstract = function () {
             Chambr = Chambr.Chambr;
             Chambr.resolve('ChambrClient->' + this.constructor.name + '->Event', -1, data, name);
         }
+
+        /**
+         * Initializes action buffer
+         * We will collect different actions
+         * to not execute them one-by-one.
+         *
+         * @private
+         */
+
     }, {
         key: _initBuffer,
         value: function value() {
             var _this2 = this;
 
-            this.buffer = new Set();
+            var buffer = this[_buffer] = new Set();
             if (this.data !== undefined && this.data.on) {
                 this.data.on(_Storage.ACTION_SIMPLE_DEL + ' ' + _Storage.ACTION_SIMPLE_SET + ' ' + _Storage.ACTION_COMPLEX, function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -78,10 +122,8 @@ var ModelAbstract = function () {
                     }
 
                     clearTimeout(_this2[_bufferTimeout]);
-                    _this2.buffer.add(args);
-                    _this2[_bufferTimeout] = setTimeout(function () {
-                        return _this2.buffer.clear();
-                    }, 0);
+                    buffer.add(args);
+                    _this2[_bufferTimeout] = setTimeout(buffer.clear, 0);
                 });
             }
         }

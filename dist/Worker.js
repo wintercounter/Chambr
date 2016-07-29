@@ -9,10 +9,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _ModelAbstract = require('./ModelAbstract');
 
-var _ModelAbstract2 = _interopRequireDefault(_ModelAbstract);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -59,7 +55,7 @@ var Chambr = function () {
             var responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient');
             if (method && isConstructor) {
                 _this.resolve(responseEventName, ev.requestId, {
-                    buffer: Array.from(model.buffer),
+                    buffer: Array.from(model[_ModelAbstract._buffer]),
                     export: _this.exports(model)
                 });
             } else if (method) {
@@ -67,20 +63,20 @@ var Chambr = function () {
                 try {
                     r.then(function (o) {
                         return _this.resolve(responseEventName, ev.requestId, {
-                            buffer: Array.from(model.buffer),
+                            buffer: Array.from(model[_ModelAbstract._buffer]),
                             export: _this.exports(model),
                             output: o
                         });
                     }).catch(function (o) {
                         return _this.reject(responseEventName, ev.requestId, {
-                            buffer: Array.from(model.buffer),
+                            buffer: Array.from(model[_ModelAbstract._buffer]),
                             export: _this.exports(model),
                             output: o
                         });
                     });
                 } catch (e) {
                     _this.resolve(responseEventName, ev.requestId, {
-                        buffer: Array.from(model.buffer),
+                        buffer: Array.from(model[_ModelAbstract._buffer]),
                         export: _this.exports(model),
                         output: r
                     });
@@ -137,8 +133,8 @@ var Chambr = function () {
     }, {
         key: 'Model',
         get: function get() {
-            _ModelAbstract2.default.Chambr = this;
-            return _ModelAbstract2.default;
+            _ModelAbstract.ModelAbstract.Chambr = this;
+            return _ModelAbstract.ModelAbstract;
         }
 
         /**
