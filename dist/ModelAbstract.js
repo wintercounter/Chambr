@@ -35,10 +35,8 @@ var ModelAbstract = function () {
      * @constructor
      */
 
-    function ModelAbstract() {
+    function ModelAbstract(data) {
         var _this = this;
-
-        var data = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 
         _classCallCheck(this, ModelAbstract);
 
@@ -49,7 +47,7 @@ var ModelAbstract = function () {
         (0, _riotObservable2.default)(this);
 
         // Save
-        this.data = data;
+        this.data = data || this.__proto__.DefaultData || [];
 
         // Initialize action buffer
         this[_initBuffer]();
