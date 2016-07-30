@@ -23,13 +23,13 @@ export default class ModelAbstract {
      * @param {*} data Default model data
      * @constructor
      */
-    constructor(data = []){
+    constructor(data){
 
         // Make it observable
         Observable(this)
 
         // Save
-        this.data = data
+        this.data = data || this.__proto__.DefaultData || []
 
         // Initialize action buffer
         this[_initBuffer]()
