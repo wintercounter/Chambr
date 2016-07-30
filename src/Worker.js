@@ -1,4 +1,4 @@
-import { ModelAbstract, _buffer } from './ModelAbstract'
+import ModelAbstract, { _buffer } from './ModelAbstract'
 
 let lastInstance = undefined
 

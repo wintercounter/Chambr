@@ -59,7 +59,7 @@ var Chambr = function () {
             var responseEventName = ChambrEvent.name.replace('ChambrWorker', 'ChambrClient');
             if (method && isConstructor) {
                 _this.resolve(responseEventName, ev.requestId, {
-                    buffer: Array.from(model.buffer),
+                    buffer: Array.from(model[_ModelAbstract._buffer]),
                     export: _this.exports(model)
                 });
             } else if (method) {
@@ -67,20 +67,20 @@ var Chambr = function () {
                 try {
                     r.then(function (o) {
                         return _this.resolve(responseEventName, ev.requestId, {
-                            buffer: Array.from(model.buffer),
+                            buffer: Array.from(model[_ModelAbstract._buffer]),
                             export: _this.exports(model),
                             output: o
                         });
                     }).catch(function (o) {
                         return _this.reject(responseEventName, ev.requestId, {
-                            buffer: Array.from(model.buffer),
+                            buffer: Array.from(model[_ModelAbstract._buffer]),
                             export: _this.exports(model),
                             output: o
                         });
                     });
                 } catch (e) {
                     _this.resolve(responseEventName, ev.requestId, {
-                        buffer: Array.from(model.buffer),
+                        buffer: Array.from(model[_ModelAbstract._buffer]),
                         export: _this.exports(model),
                         output: r
                     });
