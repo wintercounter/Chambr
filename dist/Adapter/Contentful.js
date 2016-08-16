@@ -29,13 +29,13 @@ var ContentfulAdapter = function () {
 		key: 'getClientInstance',
 		value: function getClientInstance(config) {
 			var k = config.accessToken + config.space;
-			ClientInstances[k] = ClientInstances[k] || _contentful2.default.createClient(config);
+			var instance = ClientInstances[k] = ClientInstances[k] || _contentful2.default.createClient(config);
+			return instance;
 		}
 	}]);
 
 	function ContentfulAdapter() {
 		var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-		var host = arguments[1];
 
 		_classCallCheck(this, ContentfulAdapter);
 

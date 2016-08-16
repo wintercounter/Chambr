@@ -13,12 +13,13 @@ export default class ContentfulAdapter {
 
 	static getClientInstance(config){
 		let k = config.accessToken + config.space
-		ClientInstances[k] = ClientInstances[k] || contentful.createClient(config)
+		let instance = ClientInstances[k] = ClientInstances[k] || contentful.createClient(config)
+		return instance
 	}
 
 	requestCount = 0
 
-	constructor (config = {}, host) {
+	constructor (config = {}) {
 		observable(this)
 		this.client = ContentfulAdapter.getClientInstance(config)
 	}
@@ -58,7 +59,7 @@ export default class ContentfulAdapter {
 	[_request](method, args){
 		// Trigger loading only once
 		!(++this.requestCount - 1) && this.trigger(ContentfulAdapter.EV.LOADING)
-
+		
 		return this.client[method](...args)
 			.then(result => {
 				!--this.requestCount && this.trigger(ContentfulAdapter.EV.DONE)

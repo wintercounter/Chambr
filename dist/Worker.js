@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _ModelAbstract = require('./ModelAbstract');
@@ -155,7 +157,7 @@ var Chambr = function () {
                 Object.getOwnPropertyNames(tmpModel).forEach(function (prop) {
                     if (api.findIndex(function (v) {
                         return v.name === prop;
-                    }) === -1 && prop !== 'constructor' && prop.charAt(0) !== '_') {
+                    }) === -1 && (typeof prop === 'undefined' ? 'undefined' : _typeof(prop)) !== 'symbol' && prop !== 'constructor' && prop.charAt(0) !== '_') {
                         var descriptor = Object.getOwnPropertyDescriptor(tmpModel, prop);
 
                         api.push({
