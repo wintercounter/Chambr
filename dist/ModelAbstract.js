@@ -34,7 +34,6 @@ var ModelAbstract = function () {
      * @param {*} data Default model data
      * @constructor
      */
-
     function ModelAbstract(data) {
         var _this = this;
 
@@ -116,7 +115,7 @@ var ModelAbstract = function () {
 
             var buffer = this[_buffer] = new Set();
             if (this.data !== undefined && this.data.on) {
-                this.data.on(_Storage.ACTION_SIMPLE_DEL + ' ' + _Storage.ACTION_SIMPLE_SET + ' ' + _Storage.ACTION_COMPLEX, function () {
+                this.data.on('*', function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                         args[_key] = arguments[_key];
                     }

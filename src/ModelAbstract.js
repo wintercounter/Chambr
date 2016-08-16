@@ -80,7 +80,7 @@ export default class ModelAbstract {
     [_initBuffer](){
         let buffer = this[_buffer] = new Set()
         if (this.data !== undefined && this.data.on) {
-            this.data.on(`${ACTION_SIMPLE_DEL} ${ACTION_SIMPLE_SET} ${ACTION_COMPLEX}`, (...args) => {
+            this.data.on('*', (...args) => {
                 clearTimeout(this[_bufferTimeout])
                 buffer.add(args)
                 this[_bufferTimeout] = setTimeout(buffer.clear, 0)
