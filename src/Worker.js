@@ -82,6 +82,7 @@ export default class Chambr {
                 .forEach((prop) => {
                     if (
                         api.findIndex(v => v.name === prop) === -1
+                        && typeof prop !== 'symbol'
                         && prop !== 'constructor'
                         && prop.charAt(0) !== '_'
                     ){
