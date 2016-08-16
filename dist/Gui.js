@@ -140,8 +140,9 @@ var Chambr = function () {
                     delete _this[_promises][responseId];
                 }
 
-                // Trigger an event with the name of the event
-                model.trigger(modelEvent.name, modelEvent.data);
+                // Trigger an event with the name of the method
+                var method = modelEvent.name.replace('ChambrClient->', '');
+                method && model.trigger(method, modelEvent.data);
 
                 // Trigger an event with the state of the event
                 model.trigger(modelEvent.state, modelEvent.data);
