@@ -83,7 +83,9 @@ export default class ModelAbstract {
             this.data.on('*', (...args) => {
                 clearTimeout(this[_bufferTimeout])
                 buffer.add(args)
-                this[_bufferTimeout] = setTimeout(buffer.clear, 0)
+                this[_bufferTimeout] = setTimeout(function(){
+                    buffer.clear()
+                }, 0)
             })
         }
     }

@@ -122,7 +122,9 @@ var ModelAbstract = function () {
 
                     clearTimeout(_this2[_bufferTimeout]);
                     buffer.add(args);
-                    _this2[_bufferTimeout] = setTimeout(buffer.clear, 0);
+                    _this2[_bufferTimeout] = setTimeout(function () {
+                        buffer.clear();
+                    }, 0);
                 });
             }
         }
