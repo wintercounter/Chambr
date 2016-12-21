@@ -38,7 +38,7 @@ export default class Chambr {
                 })
             }
             else if (method) {
-                let r = method(...argList)
+                let r = method.apply(model, argList)
                 try {
                     r.then(o => this.resolve(responseEventName, ev.requestId, {
                             buffer: Array.from(model[_buffer]),
