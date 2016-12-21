@@ -65,7 +65,7 @@ var Chambr = function () {
                     export: _this.exports(model)
                 });
             } else if (method) {
-                var r = method.apply(model, argList);
+                var r = method.apply(undefined, _toConsumableArray(argList));
                 try {
                     r.then(function (o) {
                         return _this.resolve(responseEventName, ev.requestId, {
