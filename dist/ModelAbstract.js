@@ -46,7 +46,7 @@ var ModelAbstract = function () {
         (0, _riotObservable2.default)(this);
 
         // Save
-        this.data = data || this.__proto__.DefaultData || [];
+        this.data = data || this.constructor.DefaultData || [];
 
         // Initialize action buffer
         this[_initBuffer]();

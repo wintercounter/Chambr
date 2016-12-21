@@ -29,7 +29,7 @@ export default class ModelAbstract {
         Observable(this)
 
         // Save
-        this.data = data || this.__proto__.DefaultData || []
+        this.data = data || this.constructor.DefaultData || []
 
         // Initialize action buffer
         this[_initBuffer]()
