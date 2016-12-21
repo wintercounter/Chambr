@@ -58,7 +58,7 @@ var Fetch = function () {
 	}]);
 
 	function Fetch() {
-		var cnf = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS : arguments[0];
+		var cnf = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULTS;
 
 		_classCallCheck(this, Fetch);
 

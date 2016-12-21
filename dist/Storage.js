@@ -29,7 +29,7 @@ var S = Set;
  * @constructor
  */
 function Arr() {
-    var input = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
     return Simple(input);
 }
@@ -40,7 +40,7 @@ function Arr() {
  * @constructor
  */
 function Obj() {
-    var input = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     return Simple(input);
 }
@@ -51,7 +51,7 @@ function Obj() {
  * @constructor
  */
 function Map() {
-    var input = arguments.length <= 0 || arguments[0] === undefined ? new M() : arguments[0];
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new M();
 
     return Complex(input);
 }
@@ -62,7 +62,7 @@ function Map() {
  * @constructor
  */
 function Set() {
-    var input = arguments.length <= 0 || arguments[0] === undefined ? new S() : arguments[0];
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new S();
 
     return Complex(input);
 }

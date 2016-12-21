@@ -25,7 +25,7 @@ var LocalStorage = function (_ObjectStorage) {
 	_inherits(LocalStorage, _ObjectStorage);
 
 	function LocalStorage() {
-		var _Object$getPrototypeO;
+		var _ref;
 
 		_classCallCheck(this, LocalStorage);
 
@@ -33,7 +33,7 @@ var LocalStorage = function (_ObjectStorage) {
 			args[_key] = arguments[_key];
 		}
 
-		var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(LocalStorage)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+		var _this = _possibleConstructorReturn(this, (_ref = LocalStorage.__proto__ || Object.getPrototypeOf(LocalStorage)).call.apply(_ref, [this].concat(args)));
 
 		_localforage2.default.getItem(_this[_ObjectStorage2.namespace]).then(function (v) {
 			_this[_ObjectStorage2.cache] = JSON.parse(v);

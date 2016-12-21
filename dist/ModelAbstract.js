@@ -90,7 +90,7 @@ var ModelAbstract = function () {
     _createClass(ModelAbstract, [{
         key: _broadcast,
         value: function value(name) {
-            var data = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+            var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
             var Chambr = this.constructor.__proto__;
             while (Chambr.name !== 'ModelAbstract') {

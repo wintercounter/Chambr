@@ -61,7 +61,7 @@ function Default(v) {
  * @constructor
  */
 function Trigger() {
-    var ev = arguments.length <= 0 || arguments[0] === undefined ? 'update' : arguments[0];
+    var ev = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'update';
 
     return function (target, name, descriptor) {
         var old = descriptor.value;
@@ -235,7 +235,7 @@ function GetSet(obj) {
  * @private
  */
 function decorate(descriptor, value) {
-    var type = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
     if (descriptor.set) {
         throw 'You tried to apply a decorator to a setter which is not allowed.';

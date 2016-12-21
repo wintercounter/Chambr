@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -97,7 +97,7 @@ var Chambr = function () {
     _createClass(Chambr, [{
         key: 'getModel',
         value: function getModel(modelName) {
-            var argList = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+            var argList = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
             var model = this.MODEL_INSTANCES[modelName];
             if (!model) {
@@ -108,7 +108,7 @@ var Chambr = function () {
     }, {
         key: 'resolve',
         value: function resolve(eventName, responseId, responseData) {
-            var responseState = arguments.length <= 3 || arguments[3] === undefined ? 'resolve' : arguments[3];
+            var responseState = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'resolve';
 
             this.HW.pub(eventName, {
                 responseId: responseId,
@@ -119,7 +119,7 @@ var Chambr = function () {
     }, {
         key: 'reject',
         value: function reject(eventName, responseId, responseData) {
-            var responseState = arguments.length <= 3 || arguments[3] === undefined ? 'reject' : arguments[3];
+            var responseState = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'reject';
 
             this.HW.pub(eventName, {
                 responseId: responseId,

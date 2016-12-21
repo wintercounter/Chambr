@@ -33,8 +33,8 @@ var namespace = exports.namespace = Symbol('namespace');
 
 var ObjectStorage = function () {
 	function ObjectStorage() {
-		var hs = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
-		var ns = arguments.length <= 1 || arguments[1] === undefined ? DELIMITER : arguments[1];
+		var hs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
+		var ns = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DELIMITER;
 
 		_classCallCheck(this, ObjectStorage);
 
@@ -49,7 +49,7 @@ var ObjectStorage = function () {
 	_createClass(ObjectStorage, [{
 		key: 'get',
 		value: function get() {
-			var keys = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var keys = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 			var s = this[cache];
 			keys = this[parse](keys);
@@ -88,7 +88,7 @@ var ObjectStorage = function () {
 	}, {
 		key: 'set',
 		value: function set() {
-			var key = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+			var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 			var value = arguments[1];
 
 			var s = this[cache];
@@ -182,7 +182,7 @@ var ObjectStorage = function () {
 	}, {
 		key: makeDomain,
 		value: function value() {
-			var keys = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+			var keys = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
 			return '' + DELIMITER + this[domain].concat(keys).join(DELIMITER) + DELIMITER;
 		}

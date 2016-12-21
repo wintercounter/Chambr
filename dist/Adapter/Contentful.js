@@ -35,7 +35,7 @@ var ContentfulAdapter = function () {
 	}]);
 
 	function ContentfulAdapter() {
-		var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+		var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 		_classCallCheck(this, ContentfulAdapter);
 
